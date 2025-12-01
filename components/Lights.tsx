@@ -1,30 +1,28 @@
+
 import React from 'react';
 
 export const Lights: React.FC = () => {
   return (
     <>
-      {/* 3-Point Studio Lighting Setup */}
+      {/* Ethereal Lighting Setup */}
       
-      {/* 1. FILL Light: Softens shadows, ensures dark areas aren't pitch black */}
-      <ambientLight intensity={0.5} />
+      {/* 1. Hemisphere Light: Replaces Environment map. Blue-ish ground for cloud reflection. */}
+      <hemisphereLight intensity={0.6} color="#ffffff" groundColor="#d0e0f0" />
 
-      {/* 2. KEY Light: Main light source (Sun), creates form and casts shadows */}
-      <directionalLight 
-        position={[5, 5, 5]} 
-        intensity={2.5} 
-        castShadow 
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-bias={-0.0001}
-      />
+      {/* 2. High Key Ambient: Fills the scene with light (Morning look) */}
+      <ambientLight intensity={0.6} />
 
-      {/* 3. RIM Light: Highlights edges, separates object from the white background */}
+      {/* 3. Warm Sun: Soft shadows, positioned high */}
       <spotLight 
-        position={[-5, 5, -5]} 
-        intensity={2} 
-        color="white" 
-        angle={0.5}
-        penumbra={1}
+        position={[10, 10, 10]} 
+        angle={0.15} 
+        penumbra={1} 
+        intensity={1.5} 
+        castShadow 
+        color="#fff0dd" 
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-bias={-0.0001}
       />
     </>
   );
