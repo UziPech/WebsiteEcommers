@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
-import { Scene } from './components/Scene';
-import { Loader } from './components/Loader';
+import { Scene } from './3d/Scene';
+import { Loader } from '../components/Loader';
 
 export default function App() {
   return (
@@ -12,9 +12,9 @@ export default function App() {
           <span className="font-bold tracking-widest text-stone-900 text-sm">VB.</span>
         </div>
         <div className="hidden md:block">
-           <span className="text-xs font-bold tracking-widest border border-stone-200 px-3 py-1 rounded-full text-stone-400">
-             EST. 2024
-           </span>
+          <span className="text-xs font-bold tracking-widest border border-stone-200 px-3 py-1 rounded-full text-stone-400">
+            EST. 2024
+          </span>
         </div>
       </header>
 
@@ -24,7 +24,7 @@ export default function App() {
           <Scene />
         </Suspense>
       </div>
-      
+
       {/* Footer/CTA */}
       <div className="absolute bottom-8 left-0 w-full text-center z-10 pointer-events-none mix-blend-difference">
         <p className="text-stone-500 text-xs tracking-widest animate-pulse">
