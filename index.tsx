@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import App from './frontend/App';
 
 const rootElement = document.getElementById('root');
@@ -17,5 +18,7 @@ if (!window.reactRoot) {
 
 // @ts-ignore
 window.reactRoot.render(
-  <App />
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 );
