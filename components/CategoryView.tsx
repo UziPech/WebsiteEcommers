@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { PRODUCTS, Product, getProductsByCategory } from '../data/products';
+import { useProducts, Product } from '../backend/ProductContext';
 
 // ============================================================================
 // Icons
@@ -100,6 +100,7 @@ interface CategoryViewProps {
 }
 
 export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, category }) => {
+    const { getProductsByCategory } = useProducts();
     const products = getProductsByCategory(category);
 
     const handleAddToCart = (product: Product) => {
