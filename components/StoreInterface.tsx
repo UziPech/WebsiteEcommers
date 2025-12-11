@@ -1,5 +1,66 @@
 import React from 'react';
-import { useStore, Product } from '../backend/useStore';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  image: string;
+  tag?: string;
+}
+
+// ============================================================================
+// Product Data
+// ============================================================================
+
+const PRODUCTS: Product[] = [
+  {
+    id: 1,
+    name: 'Monstera Deliciosa',
+    price: '$450 MXN',
+    image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80',
+    tag: 'Best Seller',
+  },
+  {
+    id: 2,
+    name: 'Palma Areca',
+    price: '$800 MXN',
+    image: 'https://images.unsplash.com/photo-1596005554384-d293674c91d7?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 3,
+    name: 'Maceta Negra',
+    price: '$250 MXN',
+    image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=800&q=80',
+    tag: 'Limited',
+  },
+  {
+    id: 4,
+    name: 'Sustrato Premium',
+    price: '$120 MXN',
+    image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 5,
+    name: 'Orquídea Real',
+    price: '$650 MXN',
+    image: 'https://images.unsplash.com/photo-1566958763363-2394fbd77180?auto=format&fit=crop&w=800&q=80',
+    tag: 'Rare',
+  },
+  {
+    id: 6,
+    name: 'Cactus San Pedro',
+    price: '$350 MXN',
+    image: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=800&q=80',
+  },
+];
+
+// ============================================================================
+// Card Component
+// ============================================================================
 
 const Card: React.FC<{ item: Product; onAdd: (item: Product) => void }> = ({ item, onAdd }) => (
   <div className="group relative flex flex-col p-4 transition-all duration-500 hover:-translate-y-1">
@@ -42,11 +103,21 @@ const Card: React.FC<{ item: Product; onAdd: (item: Product) => void }> = ({ ite
   </div>
 );
 
+// ============================================================================
+// Store Interface Component
+// ============================================================================
+
 export const StoreInterface: React.FC = () => {
-  const { products, addToCart } = useStore();
+  // Simple add to cart handler - logs to console and triggers custom event
+  const handleAddToCart = (product: Product) => {
+    console.log(`Added ${product.name} to cart`);
+    // Dispatch custom event for cart button to listen to
+    window.dispatchEvent(new CustomEvent('addToCart', { detail: product }));
+  };
 
   return (
     <div
+      id="catalogo"
       className="absolute w-full z-20 pointer-events-auto min-h-screen flex flex-col bg-gradient-to-b from-transparent to-white/10"
       style={{ top: '100vh' }}
     >
@@ -63,9 +134,9 @@ export const StoreInterface: React.FC = () => {
         </div>
 
         {/* Luxury Grid Layout - High Gaps */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20 pb-40">
-          {products.map((product) => (
-            <Card key={product.id} item={product} onAdd={addToCart} />
+        <div id="plantas" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20 pb-40">
+          {PRODUCTS.map((product) => (
+            <Card key={product.id} item={product} onAdd={handleAddToCart} />
           ))}
         </div>
 

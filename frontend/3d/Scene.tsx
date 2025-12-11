@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PerspectiveCamera, ScrollControls, useScroll, Scroll, Cloud, Stars } from '@react-three/drei';
