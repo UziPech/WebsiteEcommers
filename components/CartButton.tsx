@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart, Product } from '../backend/CartContext';
 
 // ============================================================================
@@ -44,6 +45,7 @@ const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
 export const CartButton: React.FC = () => {
     const { cart, cartCount, removeFromCart, addToCart } = useCart();
     const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
     // Listen for custom addToCart events from StoreInterface (which is inside Canvas)
     useEffect(() => {
@@ -171,6 +173,10 @@ export const CartButton: React.FC = () => {
                 {cart.length > 0 && (
                     <div className="p-6 border-t border-stone-200">
                         <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                navigate('/checkout');
+                            }}
                             className="
                 w-full py-4
                 bg-stone-900 text-white

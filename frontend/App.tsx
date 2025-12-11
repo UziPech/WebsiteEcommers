@@ -9,6 +9,7 @@ import { CartButton } from '../components/CartButton';
 import { Navbar } from '../components/Navbar';
 import { CatalogoPage, PlantasPage, MacetasPage, SuplementosPage } from '../components/CategoryView';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
+import { CheckoutPage } from '../components/CheckoutPage';
 
 // ============================================================================
 // Home Page (3D Landing)
@@ -62,6 +63,12 @@ const CategoryLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =
   </div>
 );
 
+const ScrollLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="fixed inset-0 overflow-y-auto bg-stone-50">
+    {children}
+  </div>
+);
+
 // ============================================================================
 // Main App
 // ============================================================================
@@ -82,6 +89,7 @@ export default function App() {
             <Route path="/plantas" element={<CategoryLayout><PlantasPage /></CategoryLayout>} />
             <Route path="/macetas" element={<CategoryLayout><MacetasPage /></CategoryLayout>} />
             <Route path="/suplementos" element={<CategoryLayout><SuplementosPage /></CategoryLayout>} />
+            <Route path="/checkout" element={<ScrollLayout><CheckoutPage /></ScrollLayout>} />
           </Routes>
 
           {/* Cart Button (only on home) */}

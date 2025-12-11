@@ -19,6 +19,7 @@ export interface CartItem extends Product {
 interface CartContextType {
   cart: CartItem[];
   cartCount: number;
+  cartTotal: number;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: number) => void;
   clearCart: () => void;
@@ -41,7 +42,18 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  // Helper to parse price string (e.g., "$450 MXN" -> 450)
+  const parsePrice = (priceStr: string): number => {
+    // Remove non-numeric characters except decimal point
+    const numeric = priceStr.replace(/[^0-9.]/g, '');
+    return parseFloat(numeric) || 0;
+  };
+
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  const cartTotal = cart.reduce((total, item) => {
+    return total + parsePrice(item.price) * item.quantity;
+  }, 0);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -67,7 +79,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cart, cartCount, addToCart, removeFromCart, clearCart }}
+      value={{ cart, cartCount, cartTotal, addToCart, removeFromCart, clearCart }}
     >
       {children}
     </CartContext.Provider>
