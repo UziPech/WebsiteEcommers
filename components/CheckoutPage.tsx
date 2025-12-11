@@ -58,6 +58,7 @@ const SuccessView = () => (
 export const CheckoutPage: React.FC = () => {
     const { cart, cartTotal, clearCart } = useCart();
     const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -65,12 +66,43 @@ export const CheckoutPage: React.FC = () => {
         city: '',
         zip: '',
     });
+
+    const [errors, setErrors] = useState({
+        email: '',
+        zip: '',
+    });
+
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+
+    const validateForm = () => {
+        let isValid = true;
+        const newErrors = { email: '', zip: '' };
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            newErrors.email = 'Por favor ingresa un email válido';
+            isValid = false;
+        }
+
+        // Zip validation (must be 5 digits)
+        const zipRegex = /^\d{5}$/;
+        if (!zipRegex.test(formData.zip)) {
+            newErrors.zip = 'El código postal debe tener 5 dígitos';
+            isValid = false;
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
 
     // Simulation of payment
     const handlePayment = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validateForm()) return;
+
         setIsProcessing(true);
 
         // Simulate API delay
@@ -113,6 +145,7 @@ export const CheckoutPage: React.FC = () => {
                     </header>
 
                     <form onSubmit={handlePayment} className="space-y-6">
+                        {/* Contact Info */}
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
                             <h2 className="text-lg font-semibold text-stone-900 mb-4">Información de Contacto</h2>
                             <div className="space-y-4">
@@ -131,14 +164,17 @@ export const CheckoutPage: React.FC = () => {
                                     <input
                                         type="email"
                                         required
-                                        className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-stone-500 outline-none ${errors.email ? 'border-red-500' : 'border-stone-200'}`}
                                         value={formData.email}
                                         onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        onBlur={() => validateForm()}
                                     />
+                                    {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                                 </div>
                             </div>
                         </div>
 
+                        {/* Shipping Address */}
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
                             <h2 className="text-lg font-semibold text-stone-900 mb-4">Dirección de Envío</h2>
                             <div className="space-y-4">
@@ -168,15 +204,22 @@ export const CheckoutPage: React.FC = () => {
                                         <input
                                             type="text"
                                             required
-                                            className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
+                                            maxLength={5}
+                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-stone-500 outline-none ${errors.zip ? 'border-red-500' : 'border-stone-200'}`}
                                             value={formData.zip}
-                                            onChange={e => setFormData({ ...formData, zip: e.target.value })}
+                                            onChange={e => {
+                                                const val = e.target.value.replace(/\D/g, '');
+                                                setFormData({ ...formData, zip: val });
+                                            }}
+                                            onBlur={() => validateForm()}
                                         />
+                                        {errors.zip && <p className="text-xs text-red-500 mt-1">{errors.zip}</p>}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        {/* Payment Method */}
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
                             <h2 className="text-lg font-semibold text-stone-900 mb-4">Método de Pago</h2>
 

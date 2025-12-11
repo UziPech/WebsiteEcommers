@@ -148,6 +148,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) =
                             onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                             className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
                             placeholder="https://..."
+                            pattern="https?://.+"
+                            title="Debe ser una URL válida que empiece con http:// o https://"
                             required
                         />
                     </div>
