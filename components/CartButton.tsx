@@ -65,17 +65,17 @@ export const CartButton: React.FC = () => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="
-          fixed bottom-8 right-8 z-50
-          flex items-center justify-center
-          w-16 h-16
-          rounded-full
-          bg-stone-900
-          text-white
-          shadow-2xl shadow-stone-900/30
-          transition-all duration-300
-          hover:scale-110 hover:bg-stone-800
-          active:scale-95
-        "
+                    fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50
+                    flex items-center justify-center
+                    w-14 h-14 md:w-16 md:h-16
+                    rounded-full
+                    bg-stone-900
+                    text-white
+                    shadow-2xl shadow-stone-900/30
+                    transition-all duration-300
+                    hover:scale-110 hover:bg-stone-800
+                    active:scale-95
+                "
                 aria-label="Ver carrito"
             >
                 <ShoppingBagIcon className="w-6 h-6" />
@@ -144,7 +144,7 @@ export const CartButton: React.FC = () => {
                                     className="flex gap-4 p-4 bg-stone-50 rounded-lg"
                                 >
                                     <img
-                                        src={item.image}
+                                        src={item.imageUrl || item.image}
                                         alt={item.name}
                                         className="w-20 h-20 object-cover rounded-md"
                                     />
@@ -153,7 +153,7 @@ export const CartButton: React.FC = () => {
                                             {item.name}
                                         </h3>
                                         <p className="text-sm text-stone-500 mt-1">
-                                            {item.price} × {item.quantity}
+                                            ${typeof item.price === 'number' ? item.price : item.price} MXN × {item.quantity}
                                         </p>
                                     </div>
                                     <button

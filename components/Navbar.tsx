@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../backend/AuthContext';
-import { LoginPage } from './LoginPage';
+import { useAuth } from '../backend/presentation/AuthContext';
+import { AuthModal } from './AuthModal';
 
 // ============================================================================
 // Types
@@ -40,6 +40,24 @@ const AdminIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const HeartIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+    </svg>
+);
+
+const MenuIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+);
+
+const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+);
+
 // ============================================================================
 // Component
 // ============================================================================
@@ -52,23 +70,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
     const { user, isAuthenticated, isAdmin, logout } = useAuth();
     const [showLogin, setShowLogin] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+    const handleNavClick = () => {
+        setShowMobileMenu(false);
+    };
 
     return (
         <>
-            <nav
-                className="
-          inline-flex items-center justify-center gap-6
-          px-6 py-3
-          mt-8
-          rounded-full
-          bg-white/20
-          backdrop-blur-xl
-          border border-white/30
-          shadow-lg shadow-black/5
-          transition-all duration-500
-          hover:bg-white/30 hover:shadow-xl hover:shadow-black/10
-        "
-            >
+            {/* Desktop Navbar */}
+            <nav className="
+                hidden md:inline-flex items-center justify-center gap-6
+                px-6 py-3
+                mt-8
+                rounded-full
+                bg-white/20
+                backdrop-blur-xl
+                border border-white/30
+                shadow-lg shadow-black/5
+                transition-all duration-500
+                hover:bg-white/30 hover:shadow-xl hover:shadow-black/10
+            ">
                 {/* Navigation Links */}
                 <ul className="flex items-center gap-6">
                     {NAV_LINKS.map((link) => (
@@ -76,17 +98,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                             <Link
                                 to={link.href}
                                 className="
-                  relative
-                  text-sm font-medium tracking-wide
-                  text-stone-700
-                  transition-all duration-300
-                  hover:text-stone-900
-                  after:absolute after:bottom-[-4px] after:left-0 after:right-0
-                  after:h-[1px] after:bg-stone-900
-                  after:scale-x-0 after:origin-center
-                  after:transition-transform after:duration-300
-                  hover:after:scale-x-100
-                "
+                                    relative
+                                    text-sm font-medium tracking-wide
+                                    text-stone-700
+                                    transition-all duration-300
+                                    hover:text-stone-900
+                                    after:absolute after:bottom-[-4px] after:left-0 after:right-0
+                                    after:h-[1px] after:bg-stone-900
+                                    after:scale-x-0 after:origin-center
+                                    after:transition-transform after:duration-300
+                                    hover:after:scale-x-100
+                                "
                             >
                                 {link.label}
                             </Link>
@@ -107,7 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                             <span className="w-7 h-7 rounded-full bg-stone-800 text-white flex items-center justify-center text-xs font-bold">
                                 {user?.name.charAt(0)}
                             </span>
-                            <span className="hidden md:block">{user?.name}</span>
+                            <span>{user?.name}</span>
                         </button>
 
                         {/* Dropdown Menu */}
@@ -131,6 +153,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                                     </button>
                                 )}
 
+                                <Link
+                                    to="/favoritos"
+                                    onClick={() => setShowMenu(false)}
+                                    className="w-full px-4 py-2 text-left text-sm text-stone-700 hover:bg-stone-50 flex items-center gap-2"
+                                >
+                                    <HeartIcon className="w-4 h-4" />
+                                    Mis Favoritos
+                                </Link>
+
                                 <button
                                     onClick={() => {
                                         setShowMenu(false);
@@ -149,13 +180,144 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                         className="flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors"
                     >
                         <UserIcon className="w-5 h-5" />
-                        <span className="hidden md:block">Iniciar Sesión</span>
+                        <span>Iniciar Sesión</span>
                     </button>
                 )}
             </nav>
 
-            {/* Login Modal */}
-            {showLogin && <LoginPage onClose={() => setShowLogin(false)} />}
+            {/* Mobile Navbar */}
+            <nav className="
+                md:hidden inline-flex items-center justify-center gap-4
+                px-4 py-2.5
+                mt-4
+                rounded-full
+                bg-white/20
+                backdrop-blur-xl
+                border border-white/30
+                shadow-lg shadow-black/5
+            ">
+                {/* Menu Button */}
+                <button
+                    onClick={() => setShowMobileMenu(true)}
+                    className="p-1 text-stone-700"
+                >
+                    <MenuIcon className="w-6 h-6" />
+                </button>
+
+                {/* User Button */}
+                {isAuthenticated ? (
+                    <button
+                        onClick={() => setShowMobileMenu(true)}
+                        className="w-7 h-7 rounded-full bg-stone-800 text-white flex items-center justify-center text-xs font-bold"
+                    >
+                        {user?.name.charAt(0)}
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => setShowLogin(true)}
+                        className="p-1 text-stone-700"
+                    >
+                        <UserIcon className="w-6 h-6" />
+                    </button>
+                )}
+            </nav>
+
+            {/* Mobile Full Screen Menu */}
+            {showMobileMenu && (
+                <div className="fixed inset-0 z-50 bg-white/95 backdrop-blur-xl md:hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-6 border-b border-stone-100">
+                        <h2 className="text-lg font-serif italic text-stone-900">Menú</h2>
+                        <button
+                            onClick={() => setShowMobileMenu(false)}
+                            className="p-2 hover:bg-stone-100 rounded-full"
+                        >
+                            <CloseIcon className="w-6 h-6 text-stone-700" />
+                        </button>
+                    </div>
+
+                    {/* Navigation Links */}
+                    <div className="p-6">
+                        <ul className="space-y-4">
+                            {NAV_LINKS.map((link) => (
+                                <li key={link.href}>
+                                    <Link
+                                        to={link.href}
+                                        onClick={handleNavClick}
+                                        className="block text-2xl font-medium text-stone-900 py-2 hover:text-stone-600 transition-colors"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+
+                        {/* Divider */}
+                        <div className="my-6 border-t border-stone-200" />
+
+                        {/* User Section */}
+                        {isAuthenticated ? (
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3 py-2">
+                                    <span className="w-10 h-10 rounded-full bg-stone-800 text-white flex items-center justify-center text-lg font-bold">
+                                        {user?.name.charAt(0)}
+                                    </span>
+                                    <div>
+                                        <p className="font-medium text-stone-900">{user?.name}</p>
+                                        <p className="text-sm text-stone-500 capitalize">{user?.role}</p>
+                                    </div>
+                                </div>
+
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => {
+                                            setShowMobileMenu(false);
+                                            onAdminClick?.();
+                                        }}
+                                        className="flex items-center gap-3 text-lg text-stone-700 py-2"
+                                    >
+                                        <AdminIcon className="w-5 h-5" />
+                                        Panel Admin
+                                    </button>
+                                )}
+
+                                <Link
+                                    to="/favoritos"
+                                    onClick={handleNavClick}
+                                    className="flex items-center gap-3 text-lg text-stone-700 py-2"
+                                >
+                                    <HeartIcon className="w-5 h-5" />
+                                    Mis Favoritos
+                                </Link>
+
+                                <button
+                                    onClick={() => {
+                                        setShowMobileMenu(false);
+                                        logout();
+                                    }}
+                                    className="flex items-center gap-3 text-lg text-red-600 py-2"
+                                >
+                                    Cerrar Sesión
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    setShowMobileMenu(false);
+                                    setShowLogin(true);
+                                }}
+                                className="flex items-center gap-3 text-lg text-stone-700 py-2"
+                            >
+                                <UserIcon className="w-5 h-5" />
+                                Iniciar Sesión
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Auth Modal */}
+            {showLogin && <AuthModal onClose={() => setShowLogin(false)} />}
         </>
     );
 };

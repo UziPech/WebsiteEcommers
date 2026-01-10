@@ -1,62 +1,5 @@
 import React from 'react';
-
-// ============================================================================
-// Types
-// ============================================================================
-
-interface Product {
-  id: number;
-  name: string;
-  price: string;
-  image: string;
-  tag?: string;
-}
-
-// ============================================================================
-// Product Data
-// ============================================================================
-
-const PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: 'Monstera Deliciosa',
-    price: '$450 MXN',
-    image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80',
-    tag: 'Best Seller',
-  },
-  {
-    id: 2,
-    name: 'Palma Areca',
-    price: '$800 MXN',
-    image: 'https://images.unsplash.com/photo-1596005554384-d293674c91d7?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 3,
-    name: 'Maceta Negra',
-    price: '$250 MXN',
-    image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=800&q=80',
-    tag: 'Limited',
-  },
-  {
-    id: 4,
-    name: 'Sustrato Premium',
-    price: '$120 MXN',
-    image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 5,
-    name: 'Orquídea Real',
-    price: '$650 MXN',
-    image: 'https://images.unsplash.com/photo-1566958763363-2394fbd77180?auto=format&fit=crop&w=800&q=80',
-    tag: 'Rare',
-  },
-  {
-    id: 6,
-    name: 'Cactus San Pedro',
-    price: '$350 MXN',
-    image: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&w=800&q=80',
-  },
-];
+import { Product } from '../backend/presentation/ProductContext';
 
 // ============================================================================
 // Card Component
@@ -70,7 +13,7 @@ const Card: React.FC<{ item: Product; onAdd: (item: Product) => void }> = ({ ite
     {/* Image Container - Editorial Aspect Ratio (Portrait) */}
     <div className="relative aspect-[3/4] overflow-hidden mb-6 z-10">
       <img
-        src={item.image}
+        src={item.imageUrl}
         alt={item.name}
         className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
       />
@@ -89,14 +32,14 @@ const Card: React.FC<{ item: Product; onAdd: (item: Product) => void }> = ({ ite
 
       <div className="flex flex-col items-center space-y-4">
         <span className="text-xs font-sans font-medium text-stone-500 tracking-wide">
-          {item.price}
+          ${item.price} pesos mexicanos
         </span>
 
         <button
           onClick={() => onAdd(item)}
           className="opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 rounded-full bg-stone-900 px-6 py-2 text-[10px] font-sans font-bold tracking-[0.2em] text-white uppercase hover:bg-stone-700"
         >
-          Add to Cart
+          Agregar
         </button>
       </div>
     </div>
@@ -107,7 +50,17 @@ const Card: React.FC<{ item: Product; onAdd: (item: Product) => void }> = ({ ite
 // Store Interface Component
 // ============================================================================
 
-export const StoreInterface: React.FC = () => {
+interface StoreInterfaceProps {
+  products: Product[];
+  loading?: boolean;
+}
+
+export const StoreInterface: React.FC<StoreInterfaceProps> = ({ products, loading = false }) => {
+  // Get featured products (first 6 or products with tags)
+  const featuredProducts = products
+    .filter(p => p.status === 'disponible')
+    .slice(0, 6);
+
   // Simple add to cart handler - logs to console and triggers custom event
   const handleAddToCart = (product: Product) => {
     console.log(`Added ${product.name} to cart`);
@@ -135,9 +88,20 @@ export const StoreInterface: React.FC = () => {
 
         {/* Luxury Grid Layout - High Gaps */}
         <div id="plantas" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20 pb-40">
-          {PRODUCTS.map((product) => (
-            <Card key={product.id} item={product} onAdd={handleAddToCart} />
-          ))}
+          {loading ? (
+            <div className="col-span-full text-center py-20">
+              <div className="animate-spin w-8 h-8 border-2 border-stone-300 border-t-stone-900 rounded-full mx-auto"></div>
+              <p className="text-stone-500 mt-4">Cargando productos...</p>
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <div className="col-span-full text-center py-20">
+              <p className="text-stone-500">No hay productos disponibles</p>
+            </div>
+          ) : (
+            featuredProducts.map((product) => (
+              <Card key={product.id} item={product} onAdd={handleAddToCart} />
+            ))
+          )}
         </div>
 
         {/* Footer Note */}

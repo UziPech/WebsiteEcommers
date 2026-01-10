@@ -1,6 +1,8 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useProducts, Product } from '../backend/ProductContext';
+import { Link } from 'react-router-dom';
+import { useProducts, Product } from '../backend/presentation/ProductContext';
+import { useFavorites } from '../backend/presentation/FavoritesContext';
+import { useAuth } from '../backend/presentation/AuthContext';
 
 // ============================================================================
 // Icons
@@ -9,6 +11,12 @@ import { useProducts, Product } from '../backend/ProductContext';
 const BackIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+);
+
+const HeartIcon: React.FC<{ className?: string; filled?: boolean }> = ({ className, filled }) => (
+    <svg className={className} fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
     </svg>
 );
 
@@ -43,14 +51,17 @@ const StatusBadge: React.FC<{ status: Product['status'] }> = ({ status }) => {
 interface ProductCardProps {
     product: Product;
     onAddToCart: (product: Product) => void;
+    isFavorite: boolean;
+    onToggleFavorite: () => void;
+    isAuthenticated: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => (
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, isFavorite, onToggleFavorite, isAuthenticated }) => (
     <div className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
         {/* Image */}
         <div className="aspect-square overflow-hidden">
             <img
-                src={product.image}
+                src={product.imageUrl}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
@@ -60,10 +71,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => (
                     {product.tag}
                 </span>
             )}
-            {/* Status */}
-            <div className="absolute top-4 right-4">
-                <StatusBadge status={product.status} />
-            </div>
+            {/* Favorite Button */}
+            <button
+                onClick={onToggleFavorite}
+                className={`absolute top-4 right-4 p-2 rounded-full shadow-md transition-all ${isFavorite
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white/90 text-stone-400 hover:text-red-500'
+                    }`}
+                title={isAuthenticated ? (isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos') : 'Inicia sesión para guardar favoritos'}
+            >
+                <HeartIcon className="w-5 h-5" filled={isFavorite} />
+            </button>
+        </div>
+
+        {/* Status Badge */}
+        <div className="absolute top-14 right-4">
+            <StatusBadge status={product.status} />
         </div>
 
         {/* Content */}
@@ -72,7 +95,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => (
             <p className="text-sm text-stone-500 mb-3 line-clamp-2">{product.description}</p>
 
             <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-stone-900">{product.price}</span>
+                <span className="text-lg font-bold text-stone-900">${product.price} MXN</span>
 
                 {product.status === 'disponible' ? (
                     <button
@@ -96,16 +119,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => (
 interface CategoryViewProps {
     title: string;
     subtitle: string;
-    category: string;
+    category: 'plantas' | 'macetas' | 'suplementos' | 'all';
 }
 
 export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, category }) => {
     const { getProductsByCategory } = useProducts();
+    const { isFavorite, toggleFavorite } = useFavorites();
+    const { isAuthenticated } = useAuth();
     const products = getProductsByCategory(category);
 
     const handleAddToCart = (product: Product) => {
         console.log(`Added ${product.name} to cart`);
         window.dispatchEvent(new CustomEvent('addToCart', { detail: product }));
+    };
+
+    const handleToggleFavorite = (productId: string) => {
+        if (!isAuthenticated) {
+            alert('Inicia sesión para guardar favoritos');
+            return;
+        }
+        toggleFavorite(productId);
     };
 
     return (
@@ -148,6 +181,9 @@ export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, cat
                                 key={product.id}
                                 product={product}
                                 onAddToCart={handleAddToCart}
+                                isFavorite={isFavorite(product.id)}
+                                onToggleFavorite={() => handleToggleFavorite(product.id)}
+                                isAuthenticated={isAuthenticated}
                             />
                         ))}
                     </div>

@@ -3,13 +3,16 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { Scene } from './3d/Scene';
 import { Loader } from '../components/Loader';
 import { CartProvider } from '../backend/CartContext';
-import { AuthProvider } from '../backend/AuthContext';
-import { ProductProvider } from '../backend/ProductContext';
+// Using new Supabase-connected contexts from presentation layer
+import { AuthProvider } from '../backend/presentation/AuthContext';
+import { ProductProvider } from '../backend/presentation/ProductContext';
+import { FavoritesProvider } from '../backend/presentation/FavoritesContext';
 import { CartButton } from '../components/CartButton';
 import { Navbar } from '../components/Navbar';
 import { CatalogoPage, PlantasPage, MacetasPage, SuplementosPage } from '../components/CategoryView';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { CheckoutPage } from '../components/CheckoutPage';
+import { FavoritesPage } from '../components/FavoritesPage';
 
 // ============================================================================
 // Home Page (3D Landing)
@@ -81,23 +84,26 @@ export default function App() {
   return (
     <AuthProvider>
       <ProductProvider>
-        <CartProvider>
-          {/* Routes */}
-          <Routes>
-            <Route path="/" element={<HomePage onAdminClick={() => setShowAdmin(true)} />} />
-            <Route path="/catalogo" element={<CategoryLayout><CatalogoPage /></CategoryLayout>} />
-            <Route path="/plantas" element={<CategoryLayout><PlantasPage /></CategoryLayout>} />
-            <Route path="/macetas" element={<CategoryLayout><MacetasPage /></CategoryLayout>} />
-            <Route path="/suplementos" element={<CategoryLayout><SuplementosPage /></CategoryLayout>} />
-            <Route path="/checkout" element={<ScrollLayout><CheckoutPage /></ScrollLayout>} />
-          </Routes>
+        <FavoritesProvider>
+          <CartProvider>
+            {/* Routes */}
+            <Routes>
+              <Route path="/" element={<HomePage onAdminClick={() => setShowAdmin(true)} />} />
+              <Route path="/catalogo" element={<CategoryLayout><CatalogoPage /></CategoryLayout>} />
+              <Route path="/plantas" element={<CategoryLayout><PlantasPage /></CategoryLayout>} />
+              <Route path="/macetas" element={<CategoryLayout><MacetasPage /></CategoryLayout>} />
+              <Route path="/suplementos" element={<CategoryLayout><SuplementosPage /></CategoryLayout>} />
+              <Route path="/favoritos" element={<CategoryLayout><FavoritesPage /></CategoryLayout>} />
+              <Route path="/checkout" element={<ScrollLayout><CheckoutPage /></ScrollLayout>} />
+            </Routes>
 
-          {/* Cart Button (only on home) */}
-          {isHomePage && <CartButton />}
+            {/* Cart Button (only on home) */}
+            {isHomePage && <CartButton />}
 
-          {/* Admin Dashboard */}
-          {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
-        </CartProvider>
+            {/* Admin Dashboard */}
+            {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
+          </CartProvider>
+        </FavoritesProvider>
       </ProductProvider>
     </AuthProvider>
   );

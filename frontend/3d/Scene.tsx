@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { Lights } from './Lights';
 import { MayaSculpture } from './MayaSculpture';
 import { StoreInterface } from '../../components/StoreInterface';
+import { useProducts } from '../../backend/presentation/ProductContext';
 
 // CONSTANT: Morning Mist (Premium Off-White)
 const BG_COLOR = '#f4f6f8';
@@ -57,6 +58,9 @@ const HeroContent = () => {
 };
 
 export const Scene: React.FC = () => {
+  // Use hook here, outside of Canvas context (works because Scene is inside ProductProvider in App.tsx)
+  const { products, loading } = useProducts();
+
   return (
     <Canvas
       shadows
@@ -130,7 +134,7 @@ export const Scene: React.FC = () => {
         {/* UI Layer */}
         <Scroll html style={{ width: '100%', height: '100%' }}>
           <HeroContent />
-          <StoreInterface />
+          <StoreInterface products={products} loading={loading} />
         </Scroll>
       </ScrollControls>
     </Canvas>

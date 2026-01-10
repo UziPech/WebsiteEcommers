@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useProducts, Product, ProductStatus, ProductCategory } from '../../backend/ProductContext';
-import { useAuth } from '../../backend/AuthContext';
+import { useProducts, Product, ProductStatus, ProductCategory } from '../../backend/presentation/ProductContext';
+import { useAuth } from '../../backend/presentation/AuthContext';
+import { ImageUpload } from '../ImageUpload';
 
 // ============================================================================
 // Icons
@@ -66,8 +67,8 @@ interface ProductFormProps {
 const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         name: product?.name || '',
-        price: product?.price ? product.price.replace(/[^0-9.]/g, '') : '',
-        image: product?.image || '',
+        price: product?.price?.toString() || '',
+        imageUrl: product?.imageUrl || '',
         tag: product?.tag || '',
         category: product?.category || 'plantas' as ProductCategory,
         status: product?.status || 'disponible' as ProductStatus,
@@ -76,12 +77,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) =
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Format price adds currency symbol and suffix
         const formattedData = {
             ...formData,
-            price: `$${formData.price} MXN`
+            price: parseFloat(formData.price) || 0,
         };
-        onSave(formattedData);
+        onSave(formattedData as any);
         onClose();
     };
 
@@ -141,17 +141,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) =
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-stone-700 mb-1">URL de Imagen</label>
-                        <input
-                            type="url"
-                            value={formData.image}
-                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                            className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
-                            placeholder="https://..."
-                            pattern="https?://.+"
-                            title="Debe ser una URL válida que empiece con http:// o https://"
-                            required
+                        <label className="block text-sm font-medium text-stone-700 mb-1">Imagen del Producto</label>
+                        <ImageUpload
+                            currentImageUrl={formData.imageUrl}
+                            onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
                         />
+                        {/* Also allow URL input as fallback */}
+                        <div className="mt-2">
+                            <label className="block text-xs text-stone-500 mb-1">O ingresa URL directamente:</label>
+                            <input
+                                type="url"
+                                value={formData.imageUrl}
+                                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                                className="w-full px-3 py-1.5 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
+                                placeholder="https://..."
+                            />
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -387,7 +392,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-4">
                                             <img
-                                                src={product.image}
+                                                src={product.imageUrl}
                                                 alt={product.name}
                                                 className="w-12 h-12 rounded-lg object-cover"
                                             />
@@ -400,7 +405,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 capitalize text-stone-600">{product.category}</td>
-                                    <td className="px-6 py-4 text-stone-900">{product.price}</td>
+                                    <td className="px-6 py-4 text-stone-900">${product.price} MXN</td>
                                     <td className="px-6 py-4">
                                         <select
                                             value={product.status}
