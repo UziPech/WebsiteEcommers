@@ -97,4 +97,58 @@ export class SupabaseAuthRepository implements IAuthRepository {
 
         return mapSupabaseUserToUser(data.user);
     }
+
+    async resetPasswordForEmail(email: string): Promise<boolean> {
+        // Get the correct redirect URL based on environment
+        const getRedirectUrl = () => {
+            // Check if we're in production (Vercel deployment)
+            const isProduction = window.location.hostname !== 'localhost' &&
+                window.location.hostname !== '127.0.0.1';
+
+            if (isProduction) {
+                // Use the production Vercel URL
+                return 'https://vivero-balam.vercel.app/reset-password';
+            }
+            // In development, use current origin
+            return `${window.location.origin}/reset-password`;
+        };
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: getRedirectUrl(),
+        });
+
+        if (error) {
+            console.error('Error sending password reset email:', error);
+            return false;
+        }
+
+        return true;
+    }
+
+    async updatePassword(newPassword: string): Promise<boolean> {
+        const { error } = await supabase.auth.updateUser({
+            password: newPassword,
+        });
+
+        if (error) {
+            console.error('Error updating password:', error);
+            return false;
+        }
+
+        return true;
+    }
+
+    async resendConfirmationEmail(email: string): Promise<boolean> {
+        const { error } = await supabase.auth.resend({
+            type: 'signup',
+            email,
+        });
+
+        if (error) {
+            console.error('Error resending confirmation email:', error);
+            return false;
+        }
+
+        return true;
+    }
 }

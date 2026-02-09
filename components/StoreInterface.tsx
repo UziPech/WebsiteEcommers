@@ -72,7 +72,10 @@ export const StoreInterface: React.FC<StoreInterfaceProps> = ({ products, loadin
     <div
       id="catalogo"
       className="absolute w-full z-20 pointer-events-auto min-h-screen flex flex-col bg-gradient-to-b from-transparent to-white/10"
-      style={{ top: '100vh' }}
+      style={{
+        top: '100vh',
+        touchAction: 'pan-y' // Enable vertical scrolling on mobile
+      }}
     >
       <div className="w-full max-w-7xl mx-auto px-6 py-32 md:px-12">
         {/* Editorial Section Title */}

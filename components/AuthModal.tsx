@@ -1,9 +1,11 @@
 // ============================================================================
-// AuthModal Component - Login + Registro con diseño moderno
+// AuthModal Component - Login + Registro SOLAMENTE
+// El "olvidé contraseña" redirige a otra página (como GitHub)
 // ============================================================================
 
 import React, { useState } from 'react';
 import { useAuth } from '../backend/presentation/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // ============================================================================
 // Icons
@@ -45,6 +47,7 @@ type AuthMode = 'login' | 'register';
 
 export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
     const { login, register } = useAuth();
+    const navigate = useNavigate();
     const [mode, setMode] = useState<AuthMode>('login');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -73,15 +76,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setSuccess('');
         setIsLoading(true);
 
-        const success = await login(email, password);
+        try {
+            const success = await login(email, password);
 
-        if (success) {
-            onClose();
-        } else {
-            setError('Email o contraseña incorrectos');
+            if (success) {
+                setSuccess('Inicio de sesión exitoso');
+                setTimeout(() => {
+                    onClose();
+                }, 500);
+            } else {
+                setError('Email o contraseña incorrectos. Si registraste una cuenta, verifica tu email de confirmación.');
+            }
+        } catch (err) {
+            setError('Error al iniciar sesión. Por favor intenta de nuevo.');
         }
+
         setIsLoading(false);
     };
 
@@ -95,8 +107,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
             setError('Las contraseñas no coinciden');
             return;
         }
-        if (password.length < 6) {
-            setError('La contraseña debe tener al menos 6 caracteres');
+        if (password.length < 8) {
+            setError('La contraseña debe tener al menos 8 caracteres');
             return;
         }
         if (!name.trim()) {
@@ -106,31 +118,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
 
         setIsLoading(true);
 
-        const result = await register(email, password, name);
+        try {
+            const result = await register(email, password, name);
 
-        if (result) {
-            setSuccess('¡Cuenta creada! Por favor revisa tu email para confirmar.');
-            setTimeout(() => {
-                handleModeSwitch('login');
-            }, 3000);
-        } else {
-            setError('Error al crear la cuenta. El email podría ya estar registrado.');
+            if (result) {
+                setSuccess('Cuenta creada exitosamente. Revisa tu email para confirmar tu cuenta.');
+                setTimeout(() => {
+                    handleModeSwitch('login');
+                }, 4000);
+            } else {
+                setError('No se pudo crear la cuenta. El email podría ya estar registrado.');
+            }
+        } catch (err) {
+            setError('Error al registrar. Por favor intenta de nuevo.');
         }
+
         setIsLoading(false);
     };
 
+    const handleForgotPassword = () => {
+        onClose();
+        navigate('/forgot-password');
+    };
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
+        >
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div
+                className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Close button */}
                 <button
+                    type="button"
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 rounded-full hover:bg-stone-100 transition-colors z-10"
                 >
@@ -150,19 +180,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                 {/* Tabs */}
                 <div className="flex border-b border-stone-200">
                     <button
+                        type="button"
                         onClick={() => handleModeSwitch('login')}
                         className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'login'
-                                ? 'text-stone-900 border-b-2 border-stone-900'
-                                : 'text-stone-500 hover:text-stone-700'
+                            ? 'text-stone-900 border-b-2 border-stone-900'
+                            : 'text-stone-500 hover:text-stone-700'
                             }`}
                     >
-                        Iniciar Sesión
+                        Iniciar sesión
                     </button>
                     <button
+                        type="button"
                         onClick={() => handleModeSwitch('register')}
                         className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'register'
-                                ? 'text-stone-900 border-b-2 border-stone-900'
-                                : 'text-stone-500 hover:text-stone-700'
+                            ? 'text-stone-900 border-b-2 border-stone-900'
+                            : 'text-stone-500 hover:text-stone-700'
                             }`}
                     >
                         Registrarse
@@ -189,6 +221,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                                     className="w-full pl-11 pr-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent outline-none transition-all"
                                     placeholder="Tu nombre"
                                     required
+                                    autoComplete="name"
                                 />
                             </div>
                         </div>
@@ -208,6 +241,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                                 className="w-full pl-11 pr-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent outline-none transition-all"
                                 placeholder="tu@email.com"
                                 required
+                                autoComplete="email"
                             />
                         </div>
                     </div>
@@ -226,7 +260,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                                 className="w-full pl-11 pr-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent outline-none transition-all"
                                 placeholder="••••••••"
                                 required
-                                minLength={6}
+                                minLength={mode === 'register' ? 8 : 6}
+                                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                             />
                         </div>
                     </div>
@@ -246,22 +281,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                                     className="w-full pl-11 pr-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent outline-none transition-all"
                                     placeholder="••••••••"
                                     required
-                                    minLength={6}
+                                    minLength={8}
+                                    autoComplete="new-password"
                                 />
                             </div>
                         </div>
                     )}
 
+                    {/* Forgot password link (only for login) */}
+                    {mode === 'login' && (
+                        <div className="text-right">
+                            <button
+                                type="button"
+                                onClick={handleForgotPassword}
+                                className="text-sm text-stone-600 hover:text-stone-900 transition-colors underline underline-offset-2"
+                            >
+                                ¿Olvidaste tu contraseña?
+                            </button>
+                        </div>
+                    )}
+
                     {/* Error Message */}
                     {error && (
-                        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
+                        <div className="bg-stone-50 text-stone-700 px-4 py-3 rounded-lg text-sm border border-stone-300">
                             {error}
                         </div>
                     )}
 
                     {/* Success Message */}
                     {success && (
-                        <div className="bg-green-50 text-green-600 px-4 py-3 rounded-lg text-sm">
+                        <div className="bg-stone-50 text-stone-700 px-4 py-3 rounded-lg text-sm border border-stone-300">
                             {success}
                         </div>
                     )}
@@ -270,14 +319,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3 bg-stone-900 text-white font-medium rounded-lg hover:bg-stone-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-3 bg-stone-900 text-white font-medium rounded-lg hover:bg-stone-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                     >
                         {isLoading
                             ? 'Cargando...'
                             : mode === 'login'
-                                ? 'Iniciar Sesión'
-                                : 'Crear Cuenta'}
+                                ? 'Iniciar sesión'
+                                : 'Crear cuenta'}
                     </button>
+
+                    {/* Helper text for register */}
+                    {mode === 'register' && !success && (
+                        <p className="text-xs text-stone-500 text-center">
+                            Recibirás un email de confirmación después del registro
+                        </p>
+                    )}
                 </form>
             </div>
         </div>

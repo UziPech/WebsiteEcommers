@@ -22,6 +22,8 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<boolean>;
     register: (email: string, password: string, name: string) => Promise<boolean>;
     logout: () => Promise<void>;
+    resetPassword: (email: string) => Promise<boolean>;
+    resendConfirmationEmail: (email: string) => Promise<boolean>;
 }
 
 // ============================================================================
@@ -135,9 +137,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const resetPassword = async (email: string): Promise<boolean> => {
+        try {
+            return await authRepository.resetPasswordForEmail(email);
+        } catch (err) {
+            console.error('Error sending password reset:', err);
+            return false;
+        }
+    };
+
+    const resendConfirmationEmail = async (email: string): Promise<boolean> => {
+        try {
+            return await authRepository.resendConfirmationEmail(email);
+        } catch (err) {
+            console.error('Error resending confirmation:', err);
+            return false;
+        }
+    };
+
     return (
         <AuthContext.Provider
-            value={{ user, loading, isAuthenticated, isAdmin, login, register, logout }}
+            value={{ user, loading, isAuthenticated, isAdmin, login, register, logout, resetPassword, resendConfirmationEmail }}
         >
             {children}
         </AuthContext.Provider>

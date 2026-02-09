@@ -1,0 +1,1209 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 65534,
+      "max": [
+        34.799842834472656,
+        25.29464340209961,
+        9.110711097717285
+      ],
+      "min": [
+        -33.39678955078125,
+        -28.958616256713867,
+        -9.110711097717285
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 786408,
+      "componentType": 5126,
+      "count": 65534,
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 65534,
+      "max": [
+        1.0000009536743164,
+        1.0000004768371582
+      ],
+      "min": [
+        -1.9073486328125e-06,
+        -2.384185791015625e-07
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 242223,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 1572816,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        15.743683815002441,
+        19.815811157226563,
+        4.707066535949707
+      ],
+      "min": [
+        -13.09340763092041,
+        -7.431234836578369,
+        -0.024862289428710938
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 2359200,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        0.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 524272,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        0.9999960064888
+      ],
+      "min": [
+        0.0,
+        3.999968157586409e-06
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 968892,
+      "componentType": 5125,
+      "count": 259332,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 3145584,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        23.97784996032715,
+        28.958616256713867,
+        3.0380873680114746
+      ],
+      "min": [
+        -21.60715675354004,
+        -16.62640953063965,
+        -4.5902204513549805
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 3931968,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        0.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 1048528,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0
+      ],
+      "min": [
+        -5.960464477539063e-08,
+        0.0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 2006220,
+      "componentType": 5125,
+      "count": 257868,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 4718352,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        21.111217498779297,
+        16.008634567260742,
+        0.14336776733398438
+      ],
+      "min": [
+        -5.77272367477417,
+        -8.207433700561523,
+        -4.5902204513549805
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 5504736,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        0.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 1572784,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        0.9999960064888
+      ],
+      "min": [
+        0.0,
+        3.999968157586409e-06
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 3037692,
+      "componentType": 5125,
+      "count": 260379,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 6291120,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        34.799842834472656,
+        28.958616256713867,
+        8.55475902557373
+      ],
+      "min": [
+        -33.39678955078125,
+        -28.958616256713867,
+        -8.55475902557373
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 7077504,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 2097040,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.000000238418579,
+        1.0000004768371582
+      ],
+      "min": [
+        -4.76837158203125e-07,
+        -4.76837158203125e-07
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 4079208,
+      "componentType": 5125,
+      "count": 199869,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 7863888,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        23.906234741210938,
+        28.429685592651367,
+        4.667239189147949
+      ],
+      "min": [
+        -21.367942810058594,
+        -16.33028793334961,
+        -4.5902204513549805
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 8650272,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 2621296,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0
+      ],
+      "min": [
+        -4.76837158203125e-07,
+        -5.960464477539063e-08
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 4878684,
+      "componentType": 5125,
+      "count": 255180,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 9436656,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        21.111217498779297,
+        25.890792846679688,
+        4.707066535949707
+      ],
+      "min": [
+        -17.63894271850586,
+        2.5765860080718994,
+        -4.5902204513549805
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 10223040,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        0.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 3145552,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        0.9999960064888
+      ],
+      "min": [
+        0.0,
+        3.999968157586409e-06
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 5899404,
+      "componentType": 5125,
+      "count": 259875,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 11009424,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        23.97784996032715,
+        28.958616256713867,
+        4.707066535949707
+      ],
+      "min": [
+        -30.800987243652344,
+        -16.62640953063965,
+        -2.2412757873535156
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 11795808,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        0.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 3669808,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0
+      ],
+      "min": [
+        -5.960464477539063e-08,
+        0.0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 6938904,
+      "componentType": 5125,
+      "count": 256989,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 12582192,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        36.826595306396484,
+        10.077644348144531,
+        2.5834755897521973
+      ],
+      "min": [
+        -34.62849426269531,
+        -14.794589042663574,
+        -2.6320371627807617
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 13368576,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        0.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 4194064,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 7966860,
+      "componentType": 5125,
+      "count": 259431,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 14154960,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        36.826595306396484,
+        19.778804779052734,
+        9.110711097717285
+      ],
+      "min": [
+        -33.39678955078125,
+        -28.958616256713867,
+        -9.110711097717285
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 14941344,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 4718320,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0000004768371582,
+        1.0000009536743164
+      ],
+      "min": [
+        -2.384185791015625e-07,
+        -2.384185791015625e-07
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 9004584,
+      "componentType": 5125,
+      "count": 233487,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 15727728,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        20.86840057373047,
+        25.643341064453125,
+        0.018233299255371094
+      ],
+      "min": [
+        -17.63894271850586,
+        -12.432610511779785,
+        -4.5902204513549805
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 16514112,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 5242576,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0000019073486328,
+        1.0000019073486328
+      ],
+      "min": [
+        -1.9073486328125e-06,
+        -1.9073486328125e-06
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 9938532,
+      "componentType": 5125,
+      "count": 195066,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 17300496,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        18.567258834838867,
+        19.815811157226563,
+        4.707066535949707
+      ],
+      "min": [
+        -18.566911697387695,
+        -13.248730659484863,
+        -4.5902204513549805
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 18086880,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 5766832,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0000019073486328,
+        1.0000019073486328
+      ],
+      "min": [
+        -1.9073486328125e-06,
+        -9.5367431640625e-07
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 10718796,
+      "componentType": 5125,
+      "count": 195360,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 18873264,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        20.86840057373047,
+        25.643341064453125,
+        4.707066535949707
+      ],
+      "min": [
+        -28.840084075927734,
+        -14.794589042663574,
+        -2.2412757873535156
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 19659648,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 6291088,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        1.0000019073486328,
+        1.0000019073486328
+      ],
+      "min": [
+        -1.9073486328125e-06,
+        -1.9073486328125e-06
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 11500236,
+      "componentType": 5125,
+      "count": 195204,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 20446032,
+      "componentType": 5126,
+      "count": 51569,
+      "max": [
+        36.826595306396484,
+        10.077644348144531,
+        2.5834755897521973
+      ],
+      "min": [
+        -34.62849426269531,
+        -14.794589042663574,
+        -2.6320371627807617
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 21064860,
+      "componentType": 5126,
+      "count": 51569,
+      "max": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 6815344,
+      "componentType": 5126,
+      "count": 51569,
+      "max": [
+        1.0000004768371582,
+        1.0000004768371582
+      ],
+      "min": [
+        -1.9073486328125e-06,
+        -1.1920928955078125e-07
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 12281052,
+      "componentType": 5125,
+      "count": 153765,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "idccollective (https://sketchfab.com/david.yanez.3d)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/mayan-calendar-b58714119c874f569df842cbfda11451",
+      "title": "Mayan Calendar"
+    },
+    "generator": "Sketchfab-12.66.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 12896112,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 7227896,
+      "byteOffset": 12896112,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 21683688,
+      "byteOffset": 20124008,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 41807696,
+      "uri": "scene.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "textures/lambert1_baseColor.jpeg"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "lambert1",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0.43,
+        "roughnessFactor": 0.6
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 5,
+            "POSITION": 4,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 9,
+            "POSITION": 8,
+            "TEXCOORD_0": 10
+          },
+          "indices": 11,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 13,
+            "POSITION": 12,
+            "TEXCOORD_0": 14
+          },
+          "indices": 15,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 17,
+            "POSITION": 16,
+            "TEXCOORD_0": 18
+          },
+          "indices": 19,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 21,
+            "POSITION": 20,
+            "TEXCOORD_0": 22
+          },
+          "indices": 23,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 25,
+            "POSITION": 24,
+            "TEXCOORD_0": 26
+          },
+          "indices": 27,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 29,
+            "POSITION": 28,
+            "TEXCOORD_0": 30
+          },
+          "indices": 31,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 33,
+            "POSITION": 32,
+            "TEXCOORD_0": 34
+          },
+          "indices": 35,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 37,
+            "POSITION": 36,
+            "TEXCOORD_0": 38
+          },
+          "indices": 39,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 41,
+            "POSITION": 40,
+            "TEXCOORD_0": 42
+          },
+          "indices": 43,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 45,
+            "POSITION": 44,
+            "TEXCOORD_0": 46
+          },
+          "indices": 47,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 49,
+            "POSITION": 48,
+            "TEXCOORD_0": 50
+          },
+          "indices": 51,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Calendario_Maya_lambert1_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 53,
+            "POSITION": 52,
+            "TEXCOORD_0": 54
+          },
+          "indices": 55,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "c46b692b770e439c8e050e45cd4ad1ae.fbx"
+    },
+    {
+      "children": [
+        3
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "name": "Calendario_Maya"
+    },
+    {
+      "mesh": 0,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 1,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 2,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 3,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 4,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 5,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 6,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 7,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 8,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 9,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 10,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 11,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 12,
+      "name": "Calendario_Maya_lambert1_0"
+    },
+    {
+      "mesh": 13,
+      "name": "Calendario_Maya_lambert1_0"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    }
+  ]
+}

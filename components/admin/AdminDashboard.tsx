@@ -218,6 +218,75 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) =
 };
 
 // ============================================================================
+// Product Card (Mobile View)
+// ============================================================================
+
+interface ProductCardProps {
+    product: Product;
+    onEdit: () => void;
+    onDelete: () => void;
+    onStatusChange: (status: ProductStatus) => void;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, onStatusChange }) => (
+    <div className="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
+        {/* Image and Title */}
+        <div className="flex items-start gap-3">
+            <img
+                src={product.imageUrl}
+                alt={product.name}
+                className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-stone-900 truncate">{product.name}</h3>
+                {product.tag && (
+                    <span className="text-xs text-stone-500 block">{product.tag}</span>
+                )}
+                <p className="text-sm text-stone-600 mt-1 capitalize">{product.category}</p>
+            </div>
+        </div>
+
+        {/* Price and Status */}
+        <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+            <div>
+                <p className="text-xs text-stone-500">Precio</p>
+                <p className="text-lg font-semibold text-stone-900">${product.price} MXN</p>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+                <p className="text-xs text-stone-500">Estado</p>
+                <select
+                    value={product.status}
+                    onChange={(e) => onStatusChange(e.target.value as ProductStatus)}
+                    className="px-3 py-1.5 text-sm border border-stone-200 rounded-lg bg-white"
+                >
+                    <option value="disponible">Disponible</option>
+                    <option value="vendido">Vendido</option>
+                    <option value="agotado">Agotado</option>
+                </select>
+            </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2">
+            <button
+                onClick={onEdit}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50"
+            >
+                <PencilIcon className="w-4 h-4" />
+                <span className="text-sm font-medium">Editar</span>
+            </button>
+            <button
+                onClick={onDelete}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200"
+            >
+                <TrashIcon className="w-4 h-4" />
+                <span className="text-sm font-medium">Eliminar</span>
+            </button>
+        </div>
+    </div>
+);
+
+// ============================================================================
 // Delete Confirmation Modal
 // ============================================================================
 
@@ -300,62 +369,64 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
         <div className="fixed inset-0 z-50 bg-stone-50 overflow-y-auto">
             {/* Header */}
             <header className="sticky top-0 z-40 bg-white border-b border-stone-200">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-serif italic text-stone-900">Panel de Administración</h1>
-                        <p className="text-sm text-stone-500">Bienvenido, {user?.name}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => { setEditingProduct(undefined); setShowForm(true); }}
-                            className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-colors"
-                        >
-                            <PlusIcon className="w-5 h-5" />
-                            <span>Nuevo Producto</span>
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="px-4 py-2 border border-stone-200 text-stone-600 rounded-full hover:bg-stone-50"
-                        >
-                            Volver a la Tienda
-                        </button>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 className="text-xl sm:text-2xl font-serif italic text-stone-900">Panel de Administración</h1>
+                            <p className="text-sm text-stone-500">Bienvenido, {user?.name}</p>
+                        </div>
+                        <div className="flex items-center gap-2 sm:gap-4">
+                            <button
+                                onClick={() => { setEditingProduct(undefined); setShowForm(true); }}
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-colors text-sm sm:text-base"
+                            >
+                                <PlusIcon className="w-5 h-5" />
+                                <span>Nuevo</span>
+                            </button>
+                            <button
+                                onClick={onClose}
+                                className="flex-1 sm:flex-none px-4 py-2 border border-stone-200 text-stone-600 rounded-full hover:bg-stone-50 text-sm sm:text-base"
+                            >
+                                Volver
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
 
             {/* Stats */}
-            <div className="max-w-7xl mx-auto px-6 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white rounded-xl p-6 border border-stone-200">
-                        <p className="text-sm text-stone-500">Total Productos</p>
-                        <p className="text-3xl font-bold text-stone-900">{products.length}</p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                        <p className="text-xs sm:text-sm text-stone-500">Total Productos</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-stone-900">{products.length}</p>
                     </div>
-                    <div className="bg-white rounded-xl p-6 border border-stone-200">
-                        <p className="text-sm text-stone-500">Disponibles</p>
-                        <p className="text-3xl font-bold text-emerald-600">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                        <p className="text-xs sm:text-sm text-stone-500">Disponibles</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-emerald-600">
                             {products.filter((p) => p.status === 'disponible').length}
                         </p>
                     </div>
-                    <div className="bg-white rounded-xl p-6 border border-stone-200">
-                        <p className="text-sm text-stone-500">Vendidos</p>
-                        <p className="text-3xl font-bold text-amber-600">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                        <p className="text-xs sm:text-sm text-stone-500">Vendidos</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-amber-600">
                             {products.filter((p) => p.status === 'vendido').length}
                         </p>
                     </div>
-                    <div className="bg-white rounded-xl p-6 border border-stone-200">
-                        <p className="text-sm text-stone-500">Agotados</p>
-                        <p className="text-3xl font-bold text-red-600">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                        <p className="text-xs sm:text-sm text-stone-500">Agotados</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-red-600">
                             {products.filter((p) => p.status === 'agotado').length}
                         </p>
                     </div>
                 </div>
 
                 {/* Filters */}
-                <div className="flex gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <select
                         value={filterCategory}
                         onChange={(e) => setFilterCategory(e.target.value)}
-                        className="px-4 py-2 border border-stone-200 rounded-lg bg-white"
+                        className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
                     >
                         <option value="all">Todas las categorías</option>
                         <option value="plantas">Plantas</option>
@@ -365,7 +436,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="px-4 py-2 border border-stone-200 rounded-lg bg-white"
+                        className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
                     >
                         <option value="all">Todos los estados</option>
                         <option value="disponible">Disponible</option>
@@ -374,8 +445,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                     </select>
                 </div>
 
-                {/* Product Table */}
-                <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+                {/* Product Table - Desktop */}
+                <div className="hidden md:block bg-white rounded-xl border border-stone-200 overflow-hidden">
                     <table className="w-full">
                         <thead className="bg-stone-50 border-b border-stone-200">
                             <tr>
@@ -442,6 +513,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
 
                     {filteredProducts.length === 0 && (
                         <div className="text-center py-12 text-stone-500">
+                            No hay productos que coincidan con los filtros.
+                        </div>
+                    )}
+                </div>
+
+                {/* Product Cards - Mobile */}
+                <div className="md:hidden space-y-4">
+                    {filteredProducts.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            product={product}
+                            onEdit={() => { setEditingProduct(product); setShowForm(true); }}
+                            onDelete={() => setDeletingProduct(product)}
+                            onStatusChange={(status) => handleStatusChange(product, status)}
+                        />
+                    ))}
+
+                    {filteredProducts.length === 0 && (
+                        <div className="text-center py-12 text-stone-500 bg-white rounded-xl border border-stone-200">
                             No hay productos que coincidan con los filtros.
                         </div>
                     )}
