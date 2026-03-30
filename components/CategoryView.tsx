@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts, Product } from '../backend/presentation/ProductContext';
 import { useFavorites } from '../backend/presentation/FavoritesContext';
@@ -63,6 +63,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, isFavor
             <img
                 src={product.imageUrl}
                 alt={product.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             {/* Tag */}
@@ -119,14 +121,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, isFavor
 interface CategoryViewProps {
     title: string;
     subtitle: string;
-    category: 'plantas' | 'macetas' | 'suplementos' | 'all';
+    category: string;
 }
 
 export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, category }) => {
     const { getProductsByCategory } = useProducts();
     const { isFavorite, toggleFavorite } = useFavorites();
     const { isAuthenticated } = useAuth();
+    
+    // Pagination state
+    const itemsPerPage = 8;
+    const [visibleCount, setVisibleCount] = useState(itemsPerPage);
+
+    // Filter products
     const products = getProductsByCategory(category);
+    
+    // Slice based on visible count
+    const visibleProducts = products.slice(0, visibleCount);
+    const hasMore = visibleCount < products.length;
+
+    const handleLoadMore = () => {
+        setVisibleCount(prev => prev + itemsPerPage);
+    };
 
     const handleAddToCart = (product: Product) => {
         console.log(`Added ${product.name} to cart`);
@@ -175,18 +191,32 @@ export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, cat
                         <p className="text-stone-500">No hay productos en esta categoría.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {products.map((product) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onAddToCart={handleAddToCart}
-                                isFavorite={isFavorite(product.id)}
-                                onToggleFavorite={() => handleToggleFavorite(product.id)}
-                                isAuthenticated={isAuthenticated}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {visibleProducts.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={handleAddToCart}
+                                    isFavorite={isFavorite(product.id)}
+                                    onToggleFavorite={() => handleToggleFavorite(product.id)}
+                                    isAuthenticated={isAuthenticated}
+                                />
+                            ))}
+                        </div>
+                        
+                        {/* Load More Button */}
+                        {hasMore && (
+                            <div className="mt-12 flex justify-center">
+                                <button
+                                    onClick={handleLoadMore}
+                                    className="px-8 py-3 border border-stone-200 text-stone-700 font-medium rounded-full hover:bg-stone-50 hover:text-stone-900 transition-colors shadow-sm"
+                                >
+                                    Cargar más productos
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

@@ -145,6 +145,8 @@ export const FavoritesPage: React.FC = () => {
                                     <img
                                         src={product.imageUrl}
                                         alt={product.name}
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                     {/* Remove Button */}

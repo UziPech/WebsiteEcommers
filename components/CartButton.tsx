@@ -146,6 +146,8 @@ export const CartButton: React.FC = () => {
                                     <img
                                         src={item.imageUrl || item.image}
                                         alt={item.name}
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-20 h-20 object-cover rounded-md"
                                     />
                                     <div className="flex-1">

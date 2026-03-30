@@ -3,7 +3,8 @@
 // ============================================================================
 
 export type ProductStatus = 'disponible' | 'vendido' | 'agotado';
-export type ProductCategory = 'plantas' | 'macetas' | 'suplementos';
+// Dynamic: categories are now managed via the categories table in Supabase
+export type ProductCategory = string;
 
 export interface Product {
     id: string;

@@ -185,7 +185,7 @@ export const CheckoutPage: React.FC = () => {
                             {cart.map((item) => (
                                 <li key={item.id} className="flex gap-3 md:gap-4">
                                     <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
-                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                        <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="text-sm font-medium text-stone-900 truncate">{item.name}</h3>

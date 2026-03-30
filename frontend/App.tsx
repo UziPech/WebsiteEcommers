@@ -6,6 +6,7 @@ import { CartProvider } from '../backend/CartContext';
 // Using new Supabase-connected contexts from presentation layer
 import { AuthProvider } from '../backend/presentation/AuthContext';
 import { ProductProvider } from '../backend/presentation/ProductContext';
+import { CategoryProvider } from '../backend/presentation/CategoryContext';
 import { FavoritesProvider } from '../backend/presentation/FavoritesContext';
 import { CartButton } from '../components/CartButton';
 import { Navbar } from '../components/Navbar';
@@ -86,6 +87,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ProductProvider>
+        <CategoryProvider>
         <FavoritesProvider>
           <CartProvider>
             {/* Routes */}
@@ -108,6 +110,7 @@ export default function App() {
             {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
           </CartProvider>
         </FavoritesProvider>
+        </CategoryProvider>
       </ProductProvider>
     </AuthProvider>
   );

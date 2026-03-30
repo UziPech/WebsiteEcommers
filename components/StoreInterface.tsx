@@ -15,6 +15,8 @@ const Card: React.FC<{ item: Product; onAdd: (item: Product) => void }> = ({ ite
       <img
         src={item.imageUrl}
         alt={item.name}
+        loading="lazy"
+        decoding="async"
         className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
       />
       {item.tag && (

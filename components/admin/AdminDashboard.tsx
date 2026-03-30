@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useProducts, Product, ProductStatus, ProductCategory } from '../../backend/presentation/ProductContext';
+import { useProducts, Product, ProductStatus } from '../../backend/presentation/ProductContext';
+import { useCategories, Category } from '../../backend/presentation/CategoryContext';
 import { useAuth } from '../../backend/presentation/AuthContext';
 import { ImageUpload } from '../ImageUpload';
 
@@ -32,6 +33,25 @@ const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const ChevronLeftIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+);
+
+const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+);
+
+const TagIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
+    </svg>
+);
+
 // ============================================================================
 // Status Badge
 // ============================================================================
@@ -55,22 +75,104 @@ const StatusBadge: React.FC<{ status: ProductStatus }> = ({ status }) => {
 };
 
 // ============================================================================
+// Pagination Controls
+// ============================================================================
+
+interface PaginationProps {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    onPageChange: (page: number) => void;
+}
+
+const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, totalItems, itemsPerPage, onPageChange }) => {
+    if (totalPages <= 1) return null;
+
+    const startItem = (currentPage - 1) * itemsPerPage + 1;
+    const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+    return (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 px-2">
+            <p className="text-sm text-stone-500">
+                Mostrando <span className="font-medium text-stone-700">{startItem}-{endItem}</span> de <span className="font-medium text-stone-700">{totalItems}</span> productos
+            </p>
+            <div className="flex items-center gap-2">
+                <button
+                    onClick={() => onPageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 border border-stone-200 rounded-lg hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página anterior"
+                >
+                    <ChevronLeftIcon className="w-4 h-4 text-stone-600" />
+                </button>
+
+                {/* Page numbers */}
+                <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter(page => {
+                            // Show first, last, current, and adjacent pages
+                            if (page === 1 || page === totalPages) return true;
+                            if (Math.abs(page - currentPage) <= 1) return true;
+                            return false;
+                        })
+                        .map((page, idx, arr) => {
+                            const elements = [];
+                            // Add ellipsis if there's a gap
+                            if (idx > 0 && page - arr[idx - 1] > 1) {
+                                elements.push(
+                                    <span key={`ellipsis-${page}`} className="px-1 text-stone-400 text-sm">…</span>
+                                );
+                            }
+                            elements.push(
+                                <button
+                                    key={page}
+                                    onClick={() => onPageChange(page)}
+                                    className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                                        page === currentPage
+                                            ? 'bg-stone-900 text-white'
+                                            : 'text-stone-600 hover:bg-stone-100'
+                                    }`}
+                                >
+                                    {page}
+                                </button>
+                            );
+                            return elements;
+                        })
+                    }
+                </div>
+
+                <button
+                    onClick={() => onPageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 border border-stone-200 rounded-lg hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página siguiente"
+                >
+                    <ChevronRightIcon className="w-4 h-4 text-stone-600" />
+                </button>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================================
 // Product Form Modal
 // ============================================================================
 
 interface ProductFormProps {
     product?: Product;
+    categories: Category[];
     onClose: () => void;
     onSave: (data: Omit<Product, 'id'>) => void;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) => {
+const ProductForm: React.FC<ProductFormProps> = ({ product, categories, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         name: product?.name || '',
         price: product?.price?.toString() || '',
         imageUrl: product?.imageUrl || '',
         tag: product?.tag || '',
-        category: product?.category || 'plantas' as ProductCategory,
+        category: product?.category || (categories.length > 0 ? categories[0].name.toLowerCase() : ''),
         status: product?.status || 'disponible' as ProductStatus,
         description: product?.description || '',
     });
@@ -164,12 +266,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) =
                             <label className="block text-sm font-medium text-stone-700 mb-1">Categoría</label>
                             <select
                                 value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value as ProductCategory })}
+                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                 className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
                             >
-                                <option value="plantas">Plantas</option>
-                                <option value="macetas">Macetas</option>
-                                <option value="suplementos">Suplementos</option>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.name.toLowerCase()}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                                {categories.length === 0 && (
+                                    <option value="">Sin categorías</option>
+                                )}
                             </select>
                         </div>
                         <div>
@@ -218,6 +325,90 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSave }) =
 };
 
 // ============================================================================
+// Category Form Modal
+// ============================================================================
+
+interface CategoryFormProps {
+    category?: Category;
+    onClose: () => void;
+    onSave: (data: { name: string; description?: string }) => void;
+}
+
+const CategoryForm: React.FC<CategoryFormProps> = ({ category, onClose, onSave }) => {
+    const [formData, setFormData] = useState({
+        name: category?.name || '',
+        description: category?.description || '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSave({
+            name: formData.name.trim(),
+            description: formData.description.trim() || undefined,
+        });
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-stone-200">
+                    <h2 className="text-xl font-semibold text-stone-900">
+                        {category ? 'Editar Categoría' : 'Nueva Categoría'}
+                    </h2>
+                    <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-full">
+                        <CloseIcon className="w-5 h-5 text-stone-500" />
+                    </button>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-stone-700 mb-1">Nombre de la Categoría</label>
+                        <input
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
+                            placeholder="Ej: Suculentas, Herramientas..."
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-stone-700 mb-1">Descripción (opcional)</label>
+                        <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none resize-none"
+                            rows={3}
+                            placeholder="Describe brevemente esta categoría..."
+                        />
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2 border border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            className="flex-1 px-4 py-2 bg-stone-900 text-white rounded-lg hover:bg-stone-800"
+                        >
+                            {category ? 'Guardar Cambios' : 'Crear Categoría'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================================
 // Product Card (Mobile View)
 // ============================================================================
 
@@ -235,6 +426,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, on
             <img
                 src={product.imageUrl}
                 alt={product.name}
+                loading="lazy"
+                decoding="async"
                 className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
@@ -291,17 +484,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, on
 // ============================================================================
 
 interface DeleteConfirmProps {
-    productName: string;
+    itemName: string;
+    itemType?: string;
     onConfirm: () => void;
     onCancel: () => void;
 }
 
-const DeleteConfirm: React.FC<DeleteConfirmProps> = ({ productName, onConfirm, onCancel }) => (
+const DeleteConfirm: React.FC<DeleteConfirmProps> = ({ itemName, itemType = 'producto', onConfirm, onCancel }) => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
-            <h3 className="text-lg font-semibold text-stone-900 mb-2">¿Eliminar producto?</h3>
+            <h3 className="text-lg font-semibold text-stone-900 mb-2">¿Eliminar {itemType}?</h3>
             <p className="text-stone-600 mb-6">
-                ¿Estás seguro de que quieres eliminar <strong>{productName}</strong>? Esta acción no se puede deshacer.
+                ¿Estás seguro de que quieres eliminar <strong>{itemName}</strong>? Esta acción no se puede deshacer.
             </p>
             <div className="flex gap-3">
                 <button
@@ -325,6 +519,8 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({ productName, onConfirm, o
 // Admin Dashboard
 // ============================================================================
 
+type AdminTab = 'productos' | 'categorias';
+
 interface AdminDashboardProps {
     onClose: () => void;
 }
@@ -332,20 +528,48 @@ interface AdminDashboardProps {
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
     const { user } = useAuth();
     const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+    const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
 
-    const [showForm, setShowForm] = useState(false);
+    // Tab state
+    const [activeTab, setActiveTab] = useState<AdminTab>('productos');
+
+    // Product states
+    const [showProductForm, setShowProductForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | undefined>();
     const [deletingProduct, setDeletingProduct] = useState<Product | undefined>();
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    // Category states
+    const [showCategoryForm, setShowCategoryForm] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<Category | undefined>();
+    const [deletingCategory, setDeletingCategory] = useState<Category | undefined>();
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filterCategory, filterStatus]);
+
+    // Filter products
     const filteredProducts = products.filter((p) => {
         const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
         const matchesStatus = filterStatus === 'all' || p.status === filterStatus;
         return matchesCategory && matchesStatus;
     });
 
-    const handleSave = (data: Omit<Product, 'id'>) => {
+    // Paginate
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const paginatedProducts = filteredProducts.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    // Product handlers
+    const handleSaveProduct = (data: Omit<Product, 'id'>) => {
         if (editingProduct) {
             updateProduct(editingProduct.id, data);
         } else {
@@ -354,7 +578,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
         setEditingProduct(undefined);
     };
 
-    const handleDelete = () => {
+    const handleDeleteProduct = () => {
         if (deletingProduct) {
             deleteProduct(deletingProduct.id);
             setDeletingProduct(undefined);
@@ -363,6 +587,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
 
     const handleStatusChange = (product: Product, newStatus: ProductStatus) => {
         updateProduct(product.id, { status: newStatus });
+    };
+
+    // Category handlers
+    const handleSaveCategory = (data: { name: string; description?: string }) => {
+        if (editingCategory) {
+            updateCategory(editingCategory.id, data);
+        } else {
+            addCategory(data);
+        }
+        setEditingCategory(undefined);
+    };
+
+    const handleDeleteCategory = () => {
+        if (deletingCategory) {
+            deleteCategory(deletingCategory.id);
+            setDeletingCategory(undefined);
+        }
     };
 
     return (
@@ -376,13 +617,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                             <p className="text-sm text-stone-500">Bienvenido, {user?.name}</p>
                         </div>
                         <div className="flex items-center gap-2 sm:gap-4">
-                            <button
-                                onClick={() => { setEditingProduct(undefined); setShowForm(true); }}
-                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-colors text-sm sm:text-base"
-                            >
-                                <PlusIcon className="w-5 h-5" />
-                                <span>Nuevo</span>
-                            </button>
+                            {activeTab === 'productos' && (
+                                <button
+                                    onClick={() => { setEditingProduct(undefined); setShowProductForm(true); }}
+                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-colors text-sm sm:text-base"
+                                >
+                                    <PlusIcon className="w-5 h-5" />
+                                    <span>Nuevo Producto</span>
+                                </button>
+                            )}
+                            {activeTab === 'categorias' && (
+                                <button
+                                    onClick={() => { setEditingCategory(undefined); setShowCategoryForm(true); }}
+                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-colors text-sm sm:text-base"
+                                >
+                                    <PlusIcon className="w-5 h-5" />
+                                    <span>Nueva Categoría</span>
+                                </button>
+                            )}
                             <button
                                 onClick={onClose}
                                 className="flex-1 sm:flex-none px-4 py-2 border border-stone-200 text-stone-600 rounded-full hover:bg-stone-50 text-sm sm:text-base"
@@ -391,167 +643,373 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                             </button>
                         </div>
                     </div>
+
+                    {/* Tabs */}
+                    <div className="flex gap-1 mt-4 bg-stone-100 rounded-lg p-1 w-fit">
+                        <button
+                            onClick={() => setActiveTab('productos')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                activeTab === 'productos'
+                                    ? 'bg-white text-stone-900 shadow-sm'
+                                    : 'text-stone-500 hover:text-stone-700'
+                            }`}
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                            </svg>
+                            Productos
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('categorias')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                activeTab === 'categorias'
+                                    ? 'bg-white text-stone-900 shadow-sm'
+                                    : 'text-stone-500 hover:text-stone-700'
+                            }`}
+                        >
+                            <TagIcon className="w-4 h-4" />
+                            Categorías
+                        </button>
+                    </div>
                 </div>
             </header>
 
-            {/* Stats */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
-                        <p className="text-xs sm:text-sm text-stone-500">Total Productos</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-stone-900">{products.length}</p>
+            {/* ================================================================ */}
+            {/* PRODUCTOS TAB                                                    */}
+            {/* ================================================================ */}
+            {activeTab === 'productos' && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                        <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                            <p className="text-xs sm:text-sm text-stone-500">Total Productos</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-stone-900">{products.length}</p>
+                        </div>
+                        <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                            <p className="text-xs sm:text-sm text-stone-500">Disponibles</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-emerald-600">
+                                {products.filter((p) => p.status === 'disponible').length}
+                            </p>
+                        </div>
+                        <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                            <p className="text-xs sm:text-sm text-stone-500">Vendidos</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-amber-600">
+                                {products.filter((p) => p.status === 'vendido').length}
+                            </p>
+                        </div>
+                        <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                            <p className="text-xs sm:text-sm text-stone-500">Agotados</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-red-600">
+                                {products.filter((p) => p.status === 'agotado').length}
+                            </p>
+                        </div>
                     </div>
-                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
-                        <p className="text-xs sm:text-sm text-stone-500">Disponibles</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-emerald-600">
-                            {products.filter((p) => p.status === 'disponible').length}
-                        </p>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
-                        <p className="text-xs sm:text-sm text-stone-500">Vendidos</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-amber-600">
-                            {products.filter((p) => p.status === 'vendido').length}
-                        </p>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
-                        <p className="text-xs sm:text-sm text-stone-500">Agotados</p>
-                        <p className="text-2xl sm:text-3xl font-bold text-red-600">
-                            {products.filter((p) => p.status === 'agotado').length}
-                        </p>
-                    </div>
-                </div>
 
-                {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <select
-                        value={filterCategory}
-                        onChange={(e) => setFilterCategory(e.target.value)}
-                        className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
-                    >
-                        <option value="all">Todas las categorías</option>
-                        <option value="plantas">Plantas</option>
-                        <option value="macetas">Macetas</option>
-                        <option value="suplementos">Suplementos</option>
-                    </select>
-                    <select
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
-                        className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
-                    >
-                        <option value="all">Todos los estados</option>
-                        <option value="disponible">Disponible</option>
-                        <option value="vendido">Vendido</option>
-                        <option value="agotado">Agotado</option>
-                    </select>
-                </div>
-
-                {/* Product Table - Desktop */}
-                <div className="hidden md:block bg-white rounded-xl border border-stone-200 overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-stone-50 border-b border-stone-200">
-                            <tr>
-                                <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Producto</th>
-                                <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Categoría</th>
-                                <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Precio</th>
-                                <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Estado</th>
-                                <th className="text-right px-6 py-4 text-sm font-medium text-stone-500">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-stone-100">
-                            {filteredProducts.map((product) => (
-                                <tr key={product.id} className="hover:bg-stone-50">
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-4">
-                                            <img
-                                                src={product.imageUrl}
-                                                alt={product.name}
-                                                className="w-12 h-12 rounded-lg object-cover"
-                                            />
-                                            <div>
-                                                <p className="font-medium text-stone-900">{product.name}</p>
-                                                {product.tag && (
-                                                    <span className="text-xs text-stone-500">{product.tag}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 capitalize text-stone-600">{product.category}</td>
-                                    <td className="px-6 py-4 text-stone-900">${product.price} MXN</td>
-                                    <td className="px-6 py-4">
-                                        <select
-                                            value={product.status}
-                                            onChange={(e) => handleStatusChange(product, e.target.value as ProductStatus)}
-                                            className="px-3 py-1 text-sm border border-stone-200 rounded-lg bg-white"
-                                        >
-                                            <option value="disponible">Disponible</option>
-                                            <option value="vendido">Vendido</option>
-                                            <option value="agotado">Agotado</option>
-                                        </select>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button
-                                                onClick={() => { setEditingProduct(product); setShowForm(true); }}
-                                                className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg"
-                                                title="Editar"
-                                            >
-                                                <PencilIcon className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => setDeletingProduct(product)}
-                                                className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                                                title="Eliminar"
-                                            >
-                                                <TrashIcon className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                    {/* Filters */}
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <select
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
+                        >
+                            <option value="all">Todas las categorías</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.name.toLowerCase()}>
+                                    {cat.name}
+                                </option>
                             ))}
-                        </tbody>
-                    </table>
+                        </select>
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
+                        >
+                            <option value="all">Todos los estados</option>
+                            <option value="disponible">Disponible</option>
+                            <option value="vendido">Vendido</option>
+                            <option value="agotado">Agotado</option>
+                        </select>
+                    </div>
 
-                    {filteredProducts.length === 0 && (
-                        <div className="text-center py-12 text-stone-500">
-                            No hay productos que coincidan con los filtros.
-                        </div>
-                    )}
+                    {/* Product Table - Desktop */}
+                    <div className="hidden md:block bg-white rounded-xl border border-stone-200 overflow-hidden">
+                        <table className="w-full">
+                            <thead className="bg-stone-50 border-b border-stone-200">
+                                <tr>
+                                    <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Producto</th>
+                                    <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Categoría</th>
+                                    <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Precio</th>
+                                    <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Estado</th>
+                                    <th className="text-right px-6 py-4 text-sm font-medium text-stone-500">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-stone-100">
+                                {paginatedProducts.map((product) => (
+                                    <tr key={product.id} className="hover:bg-stone-50">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-4">
+                                                <img
+                                                    src={product.imageUrl}
+                                                    alt={product.name}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    className="w-12 h-12 rounded-lg object-cover"
+                                                />
+                                                <div>
+                                                    <p className="font-medium text-stone-900">{product.name}</p>
+                                                    {product.tag && (
+                                                        <span className="text-xs text-stone-500">{product.tag}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 capitalize text-stone-600">{product.category}</td>
+                                        <td className="px-6 py-4 text-stone-900">${product.price} MXN</td>
+                                        <td className="px-6 py-4">
+                                            <select
+                                                value={product.status}
+                                                onChange={(e) => handleStatusChange(product, e.target.value as ProductStatus)}
+                                                className="px-3 py-1 text-sm border border-stone-200 rounded-lg bg-white"
+                                            >
+                                                <option value="disponible">Disponible</option>
+                                                <option value="vendido">Vendido</option>
+                                                <option value="agotado">Agotado</option>
+                                            </select>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={() => { setEditingProduct(product); setShowProductForm(true); }}
+                                                    className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg"
+                                                    title="Editar"
+                                                >
+                                                    <PencilIcon className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setDeletingProduct(product)}
+                                                    className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                                                    title="Eliminar"
+                                                >
+                                                    <TrashIcon className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        {filteredProducts.length === 0 && (
+                            <div className="text-center py-12 text-stone-500">
+                                No hay productos que coincidan con los filtros.
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Product Cards - Mobile */}
+                    <div className="md:hidden space-y-4">
+                        {paginatedProducts.map((product) => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onEdit={() => { setEditingProduct(product); setShowProductForm(true); }}
+                                onDelete={() => setDeletingProduct(product)}
+                                onStatusChange={(status) => handleStatusChange(product, status)}
+                            />
+                        ))}
+
+                        {filteredProducts.length === 0 && (
+                            <div className="text-center py-12 text-stone-500 bg-white rounded-xl border border-stone-200">
+                                No hay productos que coincidan con los filtros.
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Pagination */}
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalItems={filteredProducts.length}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={setCurrentPage}
+                    />
                 </div>
+            )}
 
-                {/* Product Cards - Mobile */}
-                <div className="md:hidden space-y-4">
-                    {filteredProducts.map((product) => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onEdit={() => { setEditingProduct(product); setShowForm(true); }}
-                            onDelete={() => setDeletingProduct(product)}
-                            onStatusChange={(status) => handleStatusChange(product, status)}
-                        />
-                    ))}
+            {/* ================================================================ */}
+            {/* CATEGORÍAS TAB                                                   */}
+            {/* ================================================================ */}
+            {activeTab === 'categorias' && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
-                    {filteredProducts.length === 0 && (
-                        <div className="text-center py-12 text-stone-500 bg-white rounded-xl border border-stone-200">
-                            No hay productos que coincidan con los filtros.
+                    {/* Stats */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                        <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                            <p className="text-xs sm:text-sm text-stone-500">Total Categorías</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-stone-900">{categories.length}</p>
                         </div>
-                    )}
-                </div>
-            </div>
+                        <div className="bg-white rounded-xl p-4 sm:p-6 border border-stone-200">
+                            <p className="text-xs sm:text-sm text-stone-500">Productos Categorizados</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-stone-900">{products.length}</p>
+                        </div>
+                    </div>
 
-            {/* Modals */}
-            {showForm && (
+                    {/* Categories Table - Desktop */}
+                    <div className="hidden md:block bg-white rounded-xl border border-stone-200 overflow-hidden">
+                        <table className="w-full">
+                            <thead className="bg-stone-50 border-b border-stone-200">
+                                <tr>
+                                    <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Nombre</th>
+                                    <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Descripción</th>
+                                    <th className="text-left px-6 py-4 text-sm font-medium text-stone-500">Productos</th>
+                                    <th className="text-right px-6 py-4 text-sm font-medium text-stone-500">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-stone-100">
+                                {categories.map((category) => {
+                                    const productCount = products.filter(
+                                        (p) => p.category.toLowerCase() === category.name.toLowerCase()
+                                    ).length;
+                                    return (
+                                        <tr key={category.id} className="hover:bg-stone-50">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center">
+                                                        <TagIcon className="w-5 h-5 text-stone-500" />
+                                                    </div>
+                                                    <span className="font-medium text-stone-900">{category.name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-stone-600 text-sm">
+                                                {category.description || <span className="text-stone-400 italic">Sin descripción</span>}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="px-2.5 py-1 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">
+                                                    {productCount} producto{productCount !== 1 ? 's' : ''}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        onClick={() => { setEditingCategory(category); setShowCategoryForm(true); }}
+                                                        className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg"
+                                                        title="Editar"
+                                                    >
+                                                        <PencilIcon className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setDeletingCategory(category)}
+                                                        className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                                                        title="Eliminar"
+                                                    >
+                                                        <TrashIcon className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+
+                        {categories.length === 0 && (
+                            <div className="text-center py-12 text-stone-500">
+                                No hay categorías. ¡Crea la primera!
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Categories Cards - Mobile */}
+                    <div className="md:hidden space-y-4">
+                        {categories.map((category) => {
+                            const productCount = products.filter(
+                                (p) => p.category.toLowerCase() === category.name.toLowerCase()
+                            ).length;
+                            return (
+                                <div key={category.id} className="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-12 h-12 rounded-lg bg-stone-100 flex items-center justify-center flex-shrink-0">
+                                            <TagIcon className="w-6 h-6 text-stone-500" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-medium text-stone-900">{category.name}</h3>
+                                            <p className="text-sm text-stone-500 mt-0.5">
+                                                {category.description || 'Sin descripción'}
+                                            </p>
+                                            <span className="inline-block mt-2 px-2.5 py-1 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">
+                                                {productCount} producto{productCount !== 1 ? 's' : ''}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 pt-2 border-t border-stone-100">
+                                        <button
+                                            onClick={() => { setEditingCategory(category); setShowCategoryForm(true); }}
+                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50"
+                                        >
+                                            <PencilIcon className="w-4 h-4" />
+                                            <span className="text-sm font-medium">Editar</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setDeletingCategory(category)}
+                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200"
+                                        >
+                                            <TrashIcon className="w-4 h-4" />
+                                            <span className="text-sm font-medium">Eliminar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {categories.length === 0 && (
+                            <div className="text-center py-12 text-stone-500 bg-white rounded-xl border border-stone-200">
+                                No hay categorías. ¡Crea la primera!
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ================================================================ */}
+            {/* Modals                                                           */}
+            {/* ================================================================ */}
+
+            {/* Product Form */}
+            {showProductForm && (
                 <ProductForm
                     product={editingProduct}
-                    onClose={() => { setShowForm(false); setEditingProduct(undefined); }}
-                    onSave={handleSave}
+                    categories={categories}
+                    onClose={() => { setShowProductForm(false); setEditingProduct(undefined); }}
+                    onSave={handleSaveProduct}
                 />
             )}
 
+            {/* Product Delete Confirm */}
             {deletingProduct && (
                 <DeleteConfirm
-                    productName={deletingProduct.name}
-                    onConfirm={handleDelete}
+                    itemName={deletingProduct.name}
+                    itemType="producto"
+                    onConfirm={handleDeleteProduct}
                     onCancel={() => setDeletingProduct(undefined)}
+                />
+            )}
+
+            {/* Category Form */}
+            {showCategoryForm && (
+                <CategoryForm
+                    category={editingCategory}
+                    onClose={() => { setShowCategoryForm(false); setEditingCategory(undefined); }}
+                    onSave={handleSaveCategory}
+                />
+            )}
+
+            {/* Category Delete Confirm */}
+            {deletingCategory && (
+                <DeleteConfirm
+                    itemName={deletingCategory.name}
+                    itemType="categoría"
+                    onConfirm={handleDeleteCategory}
+                    onCancel={() => setDeletingCategory(undefined)}
                 />
             )}
         </div>
