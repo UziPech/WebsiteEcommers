@@ -1,27 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../backend/presentation/AuthContext';
+import { useCategories } from '../backend/presentation/CategoryContext';
+import { toSlug } from './CategoryView';
 import { AuthModal } from './AuthModal';
-
-// ============================================================================
-// Types
-// ============================================================================
-
-interface NavLink {
-    label: string;
-    href: string;
-}
-
-// ============================================================================
-// Constants
-// ============================================================================
-
-const NAV_LINKS: NavLink[] = [
-    { label: 'Catálogo', href: '/catalogo' },
-    { label: 'Plantas', href: '/plantas' },
-    { label: 'Macetas', href: '/macetas' },
-    { label: 'Suplementos', href: '/suplementos' },
-];
 
 // ============================================================================
 // Icons
@@ -68,9 +50,19 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
     const { user, isAuthenticated, isAdmin, logout } = useAuth();
+    const { categories } = useCategories();
     const [showLogin, setShowLogin] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+    // Build dynamic nav links: Catálogo first, then each category from DB
+    const navLinks = [
+        { label: 'Catálogo', href: '/catalogo' },
+        ...categories.map(cat => ({
+            label: cat.name,
+            href: `/categoria/${toSlug(cat.name)}`,
+        })),
+    ];
 
     const handleNavClick = () => {
         setShowMobileMenu(false);
@@ -78,6 +70,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
 
     return (
         <>
+            {/* Hide scrollbar utility (injected once) */}
+            <style>{`
+                .scrollbar-hide::-webkit-scrollbar { display: none; }
+                .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            `}</style>
+
             {/* Desktop Navbar */}
             <nav className="
                 hidden md:inline-flex items-center justify-center gap-6
@@ -90,24 +88,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 shadow-lg shadow-black/5
                 transition-all duration-500
                 hover:bg-white/30 hover:shadow-xl hover:shadow-black/10
+                max-w-[90vw]
             ">
-                {/* Navigation Links */}
-                <ul className="flex items-center gap-6">
-                    {NAV_LINKS.map((link) => (
-                        <li key={link.href}>
+                {/* Navigation Links — scrollable horizontally */}
+                <ul className="flex items-center gap-6 overflow-x-auto scrollbar-hide max-w-[60vw]">
+                    {navLinks.map((link) => (
+                        <li key={link.href} className="flex-shrink-0">
                             <Link
                                 to={link.href}
                                 className="
                                     relative
+                                    pb-1
                                     text-sm font-medium tracking-wide
                                     text-stone-700
                                     transition-all duration-300
                                     hover:text-stone-900
-                                    after:absolute after:bottom-[-4px] after:left-0 after:right-0
-                                    after:h-[1px] after:bg-stone-900
+                                    after:absolute after:bottom-0 after:left-0 after:right-0
+                                    after:h-[2px] after:bg-stone-900
                                     after:scale-x-0 after:origin-center
                                     after:transition-transform after:duration-300
                                     hover:after:scale-x-100
+                                    whitespace-nowrap
                                 "
                             >
                                 {link.label}
@@ -117,11 +118,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 </ul>
 
                 {/* Divider */}
-                <div className="w-px h-5 bg-stone-300" />
+                <div className="w-px h-5 bg-stone-300 flex-shrink-0" />
 
                 {/* Auth Section */}
                 {isAuthenticated ? (
-                    <div className="relative">
+                    <div className="relative flex-shrink-0">
                         <button
                             onClick={() => setShowMenu(!showMenu)}
                             className="flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors"
@@ -177,7 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 ) : (
                     <button
                         onClick={() => setShowLogin(true)}
-                        className="flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors"
+                        className="flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors flex-shrink-0"
                     >
                         <UserIcon className="w-5 h-5" />
                         <span>Iniciar Sesión</span>
@@ -236,10 +237,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                         </button>
                     </div>
 
-                    {/* Navigation Links */}
-                    <div className="p-6">
+                    {/* Navigation Links — scrollable vertically */}
+                    <div className="p-6 overflow-y-auto max-h-[calc(100vh-80px)]">
                         <ul className="space-y-4">
-                            {NAV_LINKS.map((link) => (
+                            {navLinks.map((link) => (
                                 <li key={link.href}>
                                     <Link
                                         to={link.href}

@@ -10,7 +10,7 @@ import { CategoryProvider } from '../backend/presentation/CategoryContext';
 import { FavoritesProvider } from '../backend/presentation/FavoritesContext';
 import { CartButton } from '../components/CartButton';
 import { Navbar } from '../components/Navbar';
-import { CatalogoPage, PlantasPage, MacetasPage, SuplementosPage } from '../components/CategoryView';
+import { CatalogoPage, DynamicCategoryPage } from '../components/CategoryView';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { CheckoutPage } from '../components/CheckoutPage';
 import { FavoritesPage } from '../components/FavoritesPage';
@@ -30,7 +30,7 @@ const HomePage: React.FC<{ onAdminClick: () => void }> = ({ onAdminClick }) => (
       </div>
       <div className="hidden md:block">
         <span className="text-xs font-bold tracking-widest border border-stone-200 px-3 py-1 rounded-full text-stone-400">
-          EST. 2024
+          EST. 2026
         </span>
       </div>
     </header>
@@ -94,9 +94,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomePage onAdminClick={() => setShowAdmin(true)} />} />
               <Route path="/catalogo" element={<CategoryLayout><CatalogoPage /></CategoryLayout>} />
-              <Route path="/plantas" element={<CategoryLayout><PlantasPage /></CategoryLayout>} />
-              <Route path="/macetas" element={<CategoryLayout><MacetasPage /></CategoryLayout>} />
-              <Route path="/suplementos" element={<CategoryLayout><SuplementosPage /></CategoryLayout>} />
+              <Route path="/categoria/:slug" element={<CategoryLayout><DynamicCategoryPage /></CategoryLayout>} />
               <Route path="/favoritos" element={<CategoryLayout><FavoritesPage /></CategoryLayout>} />
               <Route path="/checkout" element={<ScrollLayout><CheckoutPage /></ScrollLayout>} />
               <Route path="/forgot-password" element={<ScrollLayout><ForgotPasswordPage /></ScrollLayout>} />

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useProducts, Product } from '../backend/presentation/ProductContext';
 import { useFavorites } from '../backend/presentation/FavoritesContext';
 import { useAuth } from '../backend/presentation/AuthContext';
+import { useCategories } from '../backend/presentation/CategoryContext';
 
 // ============================================================================
 // Icons
@@ -56,63 +57,115 @@ interface ProductCardProps {
     isAuthenticated: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, isFavorite, onToggleFavorite, isAuthenticated }) => (
-    <div className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
-        {/* Image */}
-        <div className="aspect-square overflow-hidden">
-            <img
-                src={product.imageUrl}
-                alt={product.name}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
-            {/* Tag */}
-            {product.tag && (
-                <span className="absolute top-4 left-4 px-3 py-1 bg-stone-900 text-white text-xs font-bold tracking-wider rounded-full">
-                    {product.tag}
-                </span>
-            )}
-            {/* Favorite Button */}
-            <button
-                onClick={onToggleFavorite}
-                className={`absolute top-4 right-4 p-2 rounded-full shadow-md transition-all ${isFavorite
-                    ? 'bg-red-500 text-white'
-                    : 'bg-white/90 text-stone-400 hover:text-red-500'
-                    }`}
-                title={isAuthenticated ? (isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos') : 'Inicia sesión para guardar favoritos'}
-            >
-                <HeartIcon className="w-5 h-5" filled={isFavorite} />
-            </button>
-        </div>
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, isFavorite, onToggleFavorite, isAuthenticated }) => {
+    const [showImageModal, setShowImageModal] = useState(false);
 
-        {/* Status Badge */}
-        <div className="absolute top-14 right-4">
-            <StatusBadge status={product.status} />
-        </div>
+    return (
+        <>
+            <div className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full">
+                {/* Image */}
+                <div 
+                    className="aspect-square overflow-hidden cursor-pointer relative"
+                    onClick={() => setShowImageModal(true)}
+                >
+                    <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    
+                    {/* Hover Overlay indicating clickability */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <span className="bg-white/90 backdrop-blur-sm text-stone-900 text-xs font-bold px-4 py-2 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                            Ver imagen completa
+                        </span>
+                    </div>
 
-        {/* Content */}
-        <div className="p-5">
-            <h3 className="text-lg font-semibold text-stone-900 mb-1">{product.name}</h3>
-            <p className="text-sm text-stone-500 mb-3 line-clamp-2">{product.description}</p>
-
-            <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-stone-900">${product.price} MXN</span>
-
-                {product.status === 'disponible' ? (
+                    {/* Tag */}
+                    {product.tag && (
+                        <span className="absolute top-4 left-4 px-3 py-1 bg-stone-900 text-white text-xs font-bold tracking-wider rounded-full z-10 pointer-events-none">
+                            {product.tag}
+                        </span>
+                    )}
+                    
+                    {/* Favorite Button */}
                     <button
-                        onClick={() => onAddToCart(product)}
-                        className="px-4 py-2 bg-stone-900 text-white text-sm font-medium rounded-full hover:bg-stone-800 transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleFavorite();
+                        }}
+                        className={`absolute top-4 right-4 p-2 rounded-full shadow-md z-10 transition-all ${isFavorite
+                            ? 'bg-red-500 text-white hover:bg-red-600'
+                            : 'bg-white/90 text-stone-400 hover:text-red-500'
+                            }`}
+                        title={isAuthenticated ? (isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos') : 'Inicia sesión para guardar favoritos'}
                     >
-                        Agregar
+                        <HeartIcon className="w-5 h-5" filled={isFavorite} />
                     </button>
-                ) : (
-                    <span className="text-sm text-stone-400">No disponible</span>
-                )}
+
+                    {/* Status Badge */}
+                    <div className="absolute top-16 right-4 z-10">
+                        <StatusBadge status={product.status} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-5 flex-1 flex flex-col">
+                    <h3 className="text-lg font-semibold text-stone-900 mb-1 line-clamp-1">{product.name}</h3>
+                    <p className="text-sm text-stone-500 mb-4 line-clamp-2 flex-1">{product.description}</p>
+
+                    <div className="flex items-center justify-between mt-auto">
+                        <span className="text-lg font-bold text-stone-900">${product.price} MXN</span>
+
+                        {product.status === 'disponible' ? (
+                            <button
+                                onClick={() => onAddToCart(product)}
+                                className="px-4 py-2 bg-stone-900 text-white text-sm font-medium rounded-full hover:bg-stone-800 transition-colors"
+                            >
+                                Agregar
+                            </button>
+                        ) : (
+                            <span className="text-sm text-stone-400">No disponible</span>
+                        )}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-);
+
+            {/* Fullscreen Image Modal */}
+            {showImageModal && (
+                <div 
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+                    onClick={() => setShowImageModal(false)}
+                >
+                    <button 
+                        className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+                        onClick={(e) => { e.stopPropagation(); setShowImageModal(false); }}
+                        title="Cerrar imagen"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <img 
+                        src={product.imageUrl} 
+                        alt={product.name} 
+                        className="max-w-[95vw] max-h-[95vh] object-contain rounded-xl shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
+        </>
+    );
+};
+
+// ============================================================================
+// Utility: Convert category name to URL slug and vice versa
+// ============================================================================
+
+export const toSlug = (name: string): string =>
+    name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
 // ============================================================================
 // Category View Component
@@ -132,6 +185,11 @@ export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, cat
     // Pagination state
     const itemsPerPage = 8;
     const [visibleCount, setVisibleCount] = useState(itemsPerPage);
+
+    // Reset visible count when category changes (e.g. navigating between categories)
+    useEffect(() => {
+        setVisibleCount(itemsPerPage);
+    }, [category]);
 
     // Filter products
     const products = getProductsByCategory(category);
@@ -224,32 +282,42 @@ export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, cat
 };
 
 // ============================================================================
-// Pre-configured Category Pages
+// Dynamic Category Page — Reads :slug from URL, maps to real category
 // ============================================================================
 
-export const PlantasPage: React.FC = () => (
-    <CategoryView
-        title="Plantas"
-        subtitle="Transforma tu espacio con nuestra selección de plantas tropicales y exóticas"
-        category="plantas"
-    />
-);
+export const DynamicCategoryPage: React.FC = () => {
+    const { slug } = useParams<{ slug: string }>();
+    const { categories } = useCategories();
 
-export const MacetasPage: React.FC = () => (
-    <CategoryView
-        title="Macetas"
-        subtitle="Macetas artesanales que complementan la belleza de tus plantas"
-        category="macetas"
-    />
-);
+    // Find the matching category by comparing slugified names
+    const matchedCategory = categories.find(c => toSlug(c.name) === slug);
 
-export const SuplementosPage: React.FC = () => (
-    <CategoryView
-        title="Suplementos"
-        subtitle="Todo lo que necesitas para el cuidado perfecto de tus plantas"
-        category="suplementos"
-    />
-);
+    if (!matchedCategory) {
+        return (
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-3xl font-serif italic text-stone-900 mb-2">Categoría no encontrada</h1>
+                    <p className="text-stone-500 mb-6">La categoría que buscas no existe o fue eliminada.</p>
+                    <Link to="/" className="px-6 py-2 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-colors">
+                        Volver al inicio
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <CategoryView
+            title={matchedCategory.name}
+            subtitle={matchedCategory.description || `Explora nuestra selección de ${matchedCategory.name.toLowerCase()}`}
+            category={matchedCategory.name.toLowerCase()}
+        />
+    );
+};
+
+// ============================================================================
+// Pre-configured Category Pages (kept for backwards compatibility)
+// ============================================================================
 
 export const CatalogoPage: React.FC = () => (
     <CategoryView
