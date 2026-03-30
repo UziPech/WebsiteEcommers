@@ -11,6 +11,7 @@ import { FavoritesProvider } from '../backend/presentation/FavoritesContext';
 import { CartButton } from '../components/CartButton';
 import { Navbar } from '../components/Navbar';
 import { CatalogoPage, DynamicCategoryPage } from '../components/CategoryView';
+import { ProductDetailsPage } from '../components/ProductDetailsPage';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { CheckoutPage } from '../components/CheckoutPage';
 import { FavoritesPage } from '../components/FavoritesPage';
@@ -99,6 +100,7 @@ export default function App() {
               <Route path="/" element={<HomePage onAdminClick={() => setShowAdmin(true)} />} />
               <Route path="/catalogo" element={<CategoryLayout><CatalogoPage /></CategoryLayout>} />
               <Route path="/categoria/:slug" element={<CategoryLayout><DynamicCategoryPage /></CategoryLayout>} />
+              <Route path="/producto/:id" element={<CategoryLayout><ProductDetailsPage /></CategoryLayout>} />
               <Route path="/favoritos" element={<CategoryLayout><FavoritesPage /></CategoryLayout>} />
               <Route path="/checkout" element={<ScrollLayout><CheckoutPage /></ScrollLayout>} />
               <Route path="/forgot-password" element={<ScrollLayout><ForgotPasswordPage /></ScrollLayout>} />

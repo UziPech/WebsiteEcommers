@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProducts, Product } from '../backend/presentation/ProductContext';
-import { toSlug } from './CategoryView';
 
 // ============================================================================
 // Search Algorithm — Relevance Scoring
@@ -211,9 +210,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose }) => {
     };
 
     const handleSelect = (product: Product) => {
-        // Navigate to the category page and close
-        const slug = toSlug(product.category);
-        navigate(`/categoria/${slug}`);
+        // Navigate to the product details page and close
+        navigate(`/producto/${product.id}`);
         handleClose();
     };
 
