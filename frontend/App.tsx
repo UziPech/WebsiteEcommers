@@ -16,12 +16,14 @@ import { CheckoutPage } from '../components/CheckoutPage';
 import { FavoritesPage } from '../components/FavoritesPage';
 import { ResetPasswordPage } from '../components/ResetPasswordPage';
 import { ForgotPasswordPage } from '../components/ForgotPasswordPage';
+import { Footer } from '../components/Footer';
 
 // ============================================================================
 // Home Page (3D Landing)
 // ============================================================================
 
 const HomePage: React.FC<{ onAdminClick: () => void }> = ({ onAdminClick }) => (
+  /* HomePage keeps overflow-hidden to contain the 3D scene within the viewport */
   <div className="relative w-full h-screen bg-white overflow-hidden">
     {/* UI Overlay - Static Header (Logo/Date only) */}
     <header className="absolute top-0 left-0 w-full p-8 z-20 flex justify-between items-start pointer-events-none">
@@ -63,15 +65,17 @@ const HomePage: React.FC<{ onAdminClick: () => void }> = ({ onAdminClick }) => (
 // ============================================================================
 
 const CategoryLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="fixed inset-0 overflow-y-auto bg-stone-50">
-    {children}
+  <div className="min-h-screen flex flex-col bg-stone-50">
+    <div className="flex-1">{children}</div>
+    <Footer />
     <CartButton />
   </div>
 );
 
 const ScrollLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="fixed inset-0 overflow-y-auto bg-stone-50">
-    {children}
+  <div className="min-h-screen flex flex-col bg-stone-50">
+    <div className="flex-1">{children}</div>
+    <Footer />
   </div>
 );
 

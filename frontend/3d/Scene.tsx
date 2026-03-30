@@ -49,6 +49,20 @@ const CameraRig: React.FC = () => {
   return null;
 };
 
+// Helper to read viewport width inside Canvas and pick the right page count
+const ResponsiveScrollControls: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { viewport } = useThree();
+  const isMobile = viewport.width < 7;
+  // Mobile: products stack 1-col so we need more virtual scroll pages
+  const pages = isMobile ? 7 : 3;
+
+  return (
+    <ScrollControls pages={pages} damping={0.05} maxSpeed={1.0}>
+      {children}
+    </ScrollControls>
+  );
+};
+
 const HeroContent = memo(() => {
   return (
     <div
@@ -92,7 +106,7 @@ export const Scene: React.FC = memo(() => {
 
       {/* Removed Environment preset to avoid Fetch Errors for HDR files */}
 
-      <ScrollControls pages={3} damping={0.05} maxSpeed={1.0}>
+      <ResponsiveScrollControls>
         <CameraRig />
 
         {/* 3D Content */}
@@ -136,7 +150,7 @@ export const Scene: React.FC = memo(() => {
           <HeroContent />
           <StoreInterface products={products} loading={loading} />
         </Scroll>
-      </ScrollControls>
+      </ResponsiveScrollControls>
     </Canvas>
   );
 });
