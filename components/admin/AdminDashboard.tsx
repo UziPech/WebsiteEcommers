@@ -52,6 +52,94 @@ const TagIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const SearchIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+    </svg>
+);
+
+// ============================================================================
+// Fuzzy Search Helpers
+// ============================================================================
+
+function scoreProductSearch(product: Product, query: string): number {
+    const q = query.trim().toLowerCase();
+    if (!q) return 1; // no query = show all with neutral score
+    const keywords = q.split(/\s+/).filter(Boolean);
+
+    const name = product.name.toLowerCase();
+    const description = (product.description || '').toLowerCase();
+    const category = (product.category || '').toLowerCase();
+    const tag = (product.tag || '').toLowerCase();
+
+    let score = 0;
+
+    // Exact full-phrase match in name → huge boost
+    if (name.includes(q)) score += 60;
+    if (name.startsWith(q)) score += 25;
+
+    // Full-phrase in category / tag
+    if (category.includes(q) || tag.includes(q)) score += 20;
+
+    // Full-phrase in description
+    if (description.includes(q)) score += 10;
+
+    // Per-keyword scoring
+    for (const kw of keywords) {
+        if (name.includes(kw)) score += 15;
+        if (name.startsWith(kw)) score += 10;
+        if (category.includes(kw) || tag.includes(kw)) score += 8;
+        if (description.includes(kw)) score += 3;
+    }
+
+    return score;
+}
+
+function scoreCategorySearch(category: Category, products: Product[], query: string): number {
+    const q = query.trim().toLowerCase();
+    if (!q) return 1;
+    const keywords = q.split(/\s+/).filter(Boolean);
+
+    const name = category.name.toLowerCase();
+    const description = (category.description || '').toLowerCase();
+
+    let score = 0;
+
+    if (name.includes(q)) score += 60;
+    if (name.startsWith(q)) score += 25;
+    if (description.includes(q)) score += 10;
+
+    for (const kw of keywords) {
+        if (name.includes(kw)) score += 15;
+        if (name.startsWith(kw)) score += 10;
+        if (description.includes(kw)) score += 3;
+    }
+
+    // Bonus: number of products in this category
+    const productCount = products.filter(p => p.category.toLowerCase() === name).length;
+    if (score > 0 && productCount > 0) score += Math.min(productCount, 5);
+
+    return score;
+}
+
+/** Highlight matching keywords in text */
+const HighlightMatch: React.FC<{ text: string; query: string }> = ({ text, query }) => {
+    if (!query.trim()) return <>{text}</>;
+    const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const pattern = keywords.map(kw => kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    const parts = text.split(regex);
+    return (
+        <>
+            {parts.map((part, i) =>
+                regex.test(part)
+                    ? <mark key={i} className="bg-amber-100 text-amber-800 rounded px-0.5">{part}</mark>
+                    : <span key={i}>{part}</span>
+            )}
+        </>
+    );
+};
+
 // ============================================================================
 // Status Badge
 // ============================================================================
@@ -539,6 +627,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
     const [deletingProduct, setDeletingProduct] = useState<Product | undefined>();
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterStatus, setFilterStatus] = useState<string>('all');
+    const [productSearch, setProductSearch] = useState('');
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -548,18 +637,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
     const [showCategoryForm, setShowCategoryForm] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | undefined>();
     const [deletingCategory, setDeletingCategory] = useState<Category | undefined>();
+    const [categorySearch, setCategorySearch] = useState('');
 
-    // Reset page when filters change
+    // Reset page when filters or search change
     useEffect(() => {
         setCurrentPage(1);
-    }, [filterCategory, filterStatus]);
+    }, [filterCategory, filterStatus, productSearch]);
 
-    // Filter products
-    const filteredProducts = products.filter((p) => {
-        const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
-        const matchesStatus = filterStatus === 'all' || p.status === filterStatus;
-        return matchesCategory && matchesStatus;
-    });
+    // Filter & search products
+    const filteredProducts = products
+        .map(p => ({ product: p, score: scoreProductSearch(p, productSearch) }))
+        .filter(({ product: p, score }) => {
+            const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
+            const matchesStatus = filterStatus === 'all' || p.status === filterStatus;
+            const matchesSearch = !productSearch.trim() || score > 0;
+            return matchesCategory && matchesStatus && matchesSearch;
+        })
+        .sort((a, b) => b.score - a.score)
+        .map(({ product }) => product);
 
     // Paginate
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -705,30 +800,57 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                         </div>
                     </div>
 
-                    {/* Filters */}
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
-                        <select
-                            value={filterCategory}
-                            onChange={(e) => setFilterCategory(e.target.value)}
-                            className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
-                        >
-                            <option value="all">Todas las categorías</option>
-                            {categories.map((cat) => (
-                                <option key={cat.id} value={cat.name.toLowerCase()}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
-                        >
-                            <option value="all">Todos los estados</option>
-                            <option value="disponible">Disponible</option>
-                            <option value="vendido">Vendido</option>
-                            <option value="agotado">Agotado</option>
-                        </select>
+                    {/* Search + Filters */}
+                    <div className="flex flex-col gap-3 mb-4 sm:mb-6">
+                        {/* Search Bar */}
+                        <div className="relative">
+                            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                            <input
+                                type="text"
+                                value={productSearch}
+                                onChange={(e) => setProductSearch(e.target.value)}
+                                placeholder="Buscar por nombre, categoría, etiqueta, descripción…"
+                                className="w-full pl-10 pr-10 py-2.5 border border-stone-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all placeholder-stone-400"
+                            />
+                            {productSearch && (
+                                <button
+                                    onClick={() => setProductSearch('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
+                                >
+                                    <CloseIcon className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+                        {/* Dropdown Filters */}
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                            <select
+                                value={filterCategory}
+                                onChange={(e) => setFilterCategory(e.target.value)}
+                                className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
+                            >
+                                <option value="all">Todas las categorías</option>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.name.toLowerCase()}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <select
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                className="w-full sm:w-auto px-4 py-2 border border-stone-200 rounded-lg bg-white text-sm"
+                            >
+                                <option value="all">Todos los estados</option>
+                                <option value="disponible">Disponible</option>
+                                <option value="vendido">Vendido</option>
+                                <option value="agotado">Agotado</option>
+                            </select>
+                            {productSearch.trim() && (
+                                <span className="inline-flex items-center text-xs text-stone-500 sm:ml-auto">
+                                    {filteredProducts.length} resultado{filteredProducts.length !== 1 ? 's' : ''}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     {/* Product Table - Desktop */}
@@ -756,14 +878,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                                                     className="w-12 h-12 rounded-lg object-cover"
                                                 />
                                                 <div>
-                                                    <p className="font-medium text-stone-900">{product.name}</p>
+                                                    <p className="font-medium text-stone-900">
+                                                        <HighlightMatch text={product.name} query={productSearch} />
+                                                    </p>
                                                     {product.tag && (
-                                                        <span className="text-xs text-stone-500">{product.tag}</span>
+                                                        <span className="text-xs text-stone-500">
+                                                            <HighlightMatch text={product.tag} query={productSearch} />
+                                                        </span>
                                                     )}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 capitalize text-stone-600">{product.category}</td>
+                                        <td className="px-6 py-4 capitalize text-stone-600">
+                                            <HighlightMatch text={product.category} query={productSearch} />
+                                        </td>
                                         <td className="px-6 py-4 text-stone-900">${product.price} MXN</td>
                                         <td className="px-6 py-4">
                                             <select
@@ -854,6 +982,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                         </div>
                     </div>
 
+                    {/* Search Bar — Categories */}
+                    <div className="relative mb-5">
+                        <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                        <input
+                            type="text"
+                            value={categorySearch}
+                            onChange={(e) => setCategorySearch(e.target.value)}
+                            placeholder="Buscar categorías por nombre o descripción…"
+                            className="w-full pl-10 pr-10 py-2.5 border border-stone-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all placeholder-stone-400"
+                        />
+                        {categorySearch && (
+                            <button
+                                onClick={() => setCategorySearch('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-colors"
+                            >
+                                <CloseIcon className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
+
                     {/* Categories Table - Desktop */}
                     <div className="hidden md:block bg-white rounded-xl border border-stone-200 overflow-hidden">
                         <table className="w-full">
@@ -866,7 +1014,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-stone-100">
-                                {categories.map((category) => {
+                                {categories
+                                    .map(cat => ({ category: cat, score: scoreCategorySearch(cat, products, categorySearch) }))
+                                    .filter(({ score }) => !categorySearch.trim() || score > 0)
+                                    .sort((a, b) => b.score - a.score)
+                                    .map(({ category }) => {
                                     const productCount = products.filter(
                                         (p) => p.category.toLowerCase() === category.name.toLowerCase()
                                     ).length;
@@ -877,11 +1029,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                                                     <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center">
                                                         <TagIcon className="w-5 h-5 text-stone-500" />
                                                     </div>
-                                                    <span className="font-medium text-stone-900">{category.name}</span>
+                                                    <span className="font-medium text-stone-900">
+                                                        <HighlightMatch text={category.name} query={categorySearch} />
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-stone-600 text-sm">
-                                                {category.description || <span className="text-stone-400 italic">Sin descripción</span>}
+                                                {category.description
+                                                    ? <HighlightMatch text={category.description} query={categorySearch} />
+                                                    : <span className="text-stone-400 italic">Sin descripción</span>}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="px-2.5 py-1 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">
@@ -912,16 +1068,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                             </tbody>
                         </table>
 
-                        {categories.length === 0 && (
+                        {categories.length === 0 && !categorySearch.trim() && (
                             <div className="text-center py-12 text-stone-500">
                                 No hay categorías. ¡Crea la primera!
+                            </div>
+                        )}
+                        {categorySearch.trim() && categories.filter(c => scoreCategorySearch(c, products, categorySearch) > 0).length === 0 && (
+                            <div className="text-center py-12 text-stone-500">
+                                No se encontraron categorías para "{categorySearch}"
                             </div>
                         )}
                     </div>
 
                     {/* Categories Cards - Mobile */}
                     <div className="md:hidden space-y-4">
-                        {categories.map((category) => {
+                        {categories
+                            .map(cat => ({ category: cat, score: scoreCategorySearch(cat, products, categorySearch) }))
+                            .filter(({ score }) => !categorySearch.trim() || score > 0)
+                            .sort((a, b) => b.score - a.score)
+                            .map(({ category }) => {
                             const productCount = products.filter(
                                 (p) => p.category.toLowerCase() === category.name.toLowerCase()
                             ).length;
@@ -932,9 +1097,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                                             <TagIcon className="w-6 h-6 text-stone-500" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-medium text-stone-900">{category.name}</h3>
+                                            <h3 className="font-medium text-stone-900">
+                                                <HighlightMatch text={category.name} query={categorySearch} />
+                                            </h3>
                                             <p className="text-sm text-stone-500 mt-0.5">
-                                                {category.description || 'Sin descripción'}
+                                                {category.description
+                                                    ? <HighlightMatch text={category.description} query={categorySearch} />
+                                                    : 'Sin descripción'}
                                             </p>
                                             <span className="inline-block mt-2 px-2.5 py-1 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">
                                                 {productCount} producto{productCount !== 1 ? 's' : ''}
@@ -961,9 +1130,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                             );
                         })}
 
-                        {categories.length === 0 && (
+                        {categories.length === 0 && !categorySearch.trim() && (
                             <div className="text-center py-12 text-stone-500 bg-white rounded-xl border border-stone-200">
                                 No hay categorías. ¡Crea la primera!
+                            </div>
+                        )}
+                        {categorySearch.trim() && categories.filter(c => scoreCategorySearch(c, products, categorySearch) > 0).length === 0 && (
+                            <div className="text-center py-12 text-stone-500 bg-white rounded-xl border border-stone-200">
+                                No se encontraron categorías para "{categorySearch}"
                             </div>
                         )}
                     </div>

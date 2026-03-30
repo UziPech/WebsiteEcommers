@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../backend/presentation/AuthContext';
 import { useCategories } from '../backend/presentation/CategoryContext';
 import { toSlug } from './CategoryView';
 import { AuthModal } from './AuthModal';
+import { SearchModal } from './SearchModal';
 
 // ============================================================================
 // Icons
@@ -40,6 +41,12 @@ const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const SearchIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+    </svg>
+);
+
 // ============================================================================
 // Component
 // ============================================================================
@@ -54,6 +61,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
     const [showLogin, setShowLogin] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [showSearch, setShowSearch] = useState(false);
+
+    // Global keyboard shortcut: Cmd+K / Ctrl+K
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setShowSearch(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, []);
 
     // Build dynamic nav links: Catálogo first, then each category from DB
     const navLinks = [
@@ -116,6 +136,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                         </li>
                     ))}
                 </ul>
+
+                {/* Search Button */}
+                <button
+                    onClick={() => setShowSearch(true)}
+                    className="flex items-center gap-1.5 text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors flex-shrink-0 group"
+                    title="Buscar (⌘K)"
+                >
+                    <SearchIcon className="w-4 h-4" />
+                    <span className="hidden lg:inline text-xs border border-stone-200 rounded px-1.5 py-0.5 font-mono group-hover:border-stone-400 transition-colors">⌘K</span>
+                </button>
 
                 {/* Divider */}
                 <div className="w-px h-5 bg-stone-300 flex-shrink-0" />
@@ -197,6 +227,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
                 border border-white/30
                 shadow-lg shadow-black/5
             ">
+                {/* Search Button — mobile */}
+                <button
+                    onClick={() => setShowSearch(true)}
+                    className="p-1 text-stone-700"
+                    title="Buscar"
+                >
+                    <SearchIcon className="w-5 h-5" />
+                </button>
+
                 {/* Menu Button */}
                 <button
                     onClick={() => setShowMobileMenu(true)}
@@ -319,6 +358,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onAdminClick }) => {
 
             {/* Auth Modal */}
             {showLogin && <AuthModal onClose={() => setShowLogin(false)} />}
+
+            {/* Search Modal */}
+            {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
         </>
     );
 };
