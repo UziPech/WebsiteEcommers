@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, memo } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -6,9 +6,9 @@ import * as THREE from 'three';
 // Set Draco decoder path for compressed models
 useGLTF.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 
-const MODEL_PATH = '/models/scene-optimized.glb';
+const MODEL_PATH = '/models/scene-draco-optimized.glb';
 
-export const MayaSculpture: React.FC = () => {
+export const MayaSculpture: React.FC = memo(() => {
   const { scene } = useGLTF(MODEL_PATH);
   const processedRef = useRef(false);
   const { viewport } = useThree();
@@ -57,7 +57,7 @@ export const MayaSculpture: React.FC = () => {
       />
     </group>
   );
-};
+});
 
 // Preload the model
 useGLTF.preload(MODEL_PATH);
