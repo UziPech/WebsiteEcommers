@@ -29,17 +29,17 @@ const HomePage: React.FC<{ onAdminClick: () => void }> = ({ onAdminClick }) => (
     {/* UI Overlay - Static Header (Logo/Date only) */}
     <header className="absolute top-0 left-0 w-full p-8 z-20 flex justify-between items-start pointer-events-none">
       <div>
-        <span className="font-bold tracking-widest text-stone-900 text-sm">VB.</span>
+        <span className="font-vogue font-bold tracking-widest text-stone-900 text-xl md:text-2xl">VB.</span>
       </div>
       <div className="hidden md:block">
-        <span className="text-xs font-bold tracking-widest border border-stone-200 px-3 py-1 rounded-full text-stone-400">
+        <span className="text-xs font-light tracking-[0.2em] border border-stone-200 px-3 py-1 rounded-full text-stone-400">
           EST. 2026
         </span>
       </div>
     </header>
 
     {/* Floating Glassmorphism Navbar */}
-    <div className="absolute top-32 left-0 w-full z-20 flex justify-center pointer-events-none">
+    <div className="absolute top-[280px] md:top-64 left-0 w-full z-20 flex justify-center pointer-events-none px-4">
       <div className="pointer-events-auto">
         <Navbar onAdminClick={onAdminClick} />
       </div>

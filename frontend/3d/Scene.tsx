@@ -1,6 +1,6 @@
-import React, { useRef, memo } from 'react';
+import React, { useRef, memo, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { PerspectiveCamera, ScrollControls, useScroll, Scroll, Cloud, Stars } from '@react-three/drei';
+import { PerspectiveCamera, ScrollControls, useScroll, Scroll, Cloud, Stars, PerformanceMonitor } from '@react-three/drei';
 import * as THREE from 'three';
 import { Lights } from './Lights';
 import { MayaSculpture } from './MayaSculpture';
@@ -66,34 +66,93 @@ const ResponsiveScrollControls: React.FC<{ children: React.ReactNode }> = ({ chi
 const HeroContent = memo(() => {
   return (
     <div
-      className="absolute top-0 left-0 w-full pt-12 flex flex-col items-center z-10 pointer-events-none"
+      className="absolute top-0 left-0 w-full pt-32 md:pt-24 flex flex-col items-center z-10 pointer-events-none px-6"
       style={{ transition: 'opacity 0.3s ease-out' }}
     >
-      <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-stone-900 leading-none mb-4">
-        VIVERO BALAM
+      <h1 className="flex flex-col items-center justify-center leading-none mb-6 w-full">
+        <span className="text-5xl md:text-7xl font-vogue font-bold tracking-widest text-stone-900 mb-1 w-full text-center">
+          VIVERO
+        </span>
+        <span className="text-6xl md:text-8xl font-cursive font-bold text-stone-800 -mt-4 md:-mt-6 w-full text-center pl-2">
+          Balam
+        </span>
       </h1>
-      <h2 className="text-lg md:text-xl font-medium tracking-wide text-stone-800 max-w-md mx-auto text-center">
-        Artesanías y novedades en el mejor lugar
+      <h2 className="text-xs md:text-sm font-light tracking-[0.2em] text-stone-500 max-w-xs md:max-w-md mx-auto text-center uppercase">
+        Artesanías y novedades
       </h2>
     </div>
+  );
+});
+
+const OptimizedClouds = memo(() => {
+  const { viewport } = useThree();
+  const isMobile = viewport.width < 7;
+
+  if (isMobile) {
+    return (
+      <group position={[0, -4.2, 0]}>
+        {/* En móvil: una sola nube pero con mayor opacidad y presencia para que se note */}
+        <Cloud
+          opacity={0.9}
+          speed={0.1}
+          bounds={[10, 1, 4]}
+          segments={5}
+          color="#c0c6cc"
+        />
+      </group>
+    );
+  }
+
+  return (
+    <group position={[0, -4.2, 0]}>
+      {/* Capa principal: neblina densa gris-claro en la base */}
+      <Cloud
+        opacity={1}
+        speed={0.15}
+        bounds={[10, 2, 4]}
+        segments={8}
+        color="#d0d4d8"
+      />
+      {/* Capa media: gris más notorio, ancha */}
+      <Cloud
+        opacity={0.85}
+        speed={0.1}
+        bounds={[14, 1.5, 5]}
+        segments={6}
+        position={[0, -0.3, 0]}
+        color="#c0c6cc"
+      />
+      {/* Capa baja: gris-azulado para profundidad */}
+      <Cloud
+        opacity={0.6}
+        speed={0.08}
+        bounds={[18, 2.5, 4]}
+        segments={5}
+        position={[0, -1.2, -4]}
+        color="#b0b8c0"
+      />
+    </group>
   );
 });
 
 export const Scene: React.FC = memo(() => {
   // Use hook here, outside of Canvas context (works because Scene is inside ProductProvider in App.tsx)
   const { products, loading } = useProducts();
+  const [dpr, setDpr] = useState<number>(1.5);
 
   return (
     <Canvas
-      dpr={[1, 1.5]}
+      dpr={dpr}
       gl={{
         antialias: false,
         alpha: false,
         powerPreference: "high-performance",
         toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.0
+        toneMappingExposure: 1.4
       }}
     >
+      <PerformanceMonitor onIncline={() => setDpr(1.5)} onDecline={() => setDpr(1)} />
+      
       {/* 1. PALETTE: Morning Mist */}
       <color attach="background" args={[BG_COLOR]} />
 
@@ -114,26 +173,8 @@ export const Scene: React.FC = memo(() => {
           <MayaSculpture />
         </group>
 
-        {/* Nubes más visibles */}
-        <group position={[0, -4, 0]}>
-          {/* Capa principal de nubes - más visible */}
-          <Cloud
-            opacity={0.7}
-            speed={0.2}
-            bounds={[10, 2, 1.5]}
-            segments={4}
-            color="#ffffff"
-          />
-          {/* Segunda capa - fondo */}
-          <Cloud
-            opacity={0.4}
-            speed={0.15}
-            bounds={[15, 2, 2]}
-            segments={3}
-            position={[0, -1, -8]}
-            color="#e8f0f8"
-          />
-        </group>
+        {/* Neblina envolvente optimizada */}
+        <OptimizedClouds />
 
         <Stars
           radius={80}

@@ -143,7 +143,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
             onClick={(e) => {
                 if (e.target === e.currentTarget) {
                     onClose();
@@ -151,11 +151,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
             }}
         >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-            {/* Modal */}
+            {/* Modal — ocupa toda la pantalla en móvil, max-w-md en desktop */}
             <div
-                className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+                className="relative w-full sm:max-w-md bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[95dvh] sm:max-h-[90dvh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Close button */}
@@ -167,8 +167,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                     <CloseIcon className="w-5 h-5 text-stone-400" />
                 </button>
 
-                {/* Header */}
-                <div className="bg-gradient-to-r from-stone-800 to-stone-900 px-8 py-6 text-center">
+                {/* Header — fijo arriba */}
+                <div className="bg-gradient-to-r from-stone-800 to-stone-900 px-8 py-6 text-center flex-shrink-0">
                     <h2 className="text-2xl font-serif italic text-white">
                         Vivero Balam
                     </h2>
@@ -177,8 +177,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                     </p>
                 </div>
 
-                {/* Tabs */}
-                <div className="flex border-b border-stone-200">
+                {/* Tabs — fijo debajo del header */}
+                <div className="flex border-b border-stone-200 flex-shrink-0">
                     <button
                         type="button"
                         onClick={() => handleModeSwitch('login')}
@@ -201,7 +201,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                     </button>
                 </div>
 
-                {/* Form */}
+                {/* Form — esta sección es la que hace scroll */}
+                <div className="overflow-y-auto overscroll-contain flex-1">
                 <form
                     onSubmit={mode === 'login' ? handleLogin : handleRegister}
                     className="p-8 space-y-5"
@@ -335,6 +336,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                         </p>
                     )}
                 </form>
+                </div>{/* fin scroll wrapper */}
             </div>
         </div>
     );

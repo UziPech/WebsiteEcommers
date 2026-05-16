@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useFavorites } from '../backend/presentation/FavoritesContext';
 import { useAuth } from '../backend/presentation/AuthContext';
 import { Product } from '../backend/presentation/ProductContext';
+import { SkeletonHeader, SkeletonHero, SkeletonGrid } from './Skeletons';
 
 // ============================================================================
 // Icons
@@ -91,6 +92,19 @@ export const FavoritesPage: React.FC = () => {
         );
     }
 
+    // ── Loading skeleton ──────────────────────────────────────────────────
+    if (loadingProducts || loading) {
+        return (
+            <div className="min-h-screen bg-stone-50">
+                <SkeletonHeader />
+                <SkeletonHero />
+                <div className="max-w-7xl mx-auto px-6 pb-20">
+                    <SkeletonGrid count={4} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-stone-50">
             {/* Header */}
@@ -117,12 +131,7 @@ export const FavoritesPage: React.FC = () => {
 
             {/* Content */}
             <div className="max-w-7xl mx-auto px-6 pb-20">
-                {loadingProducts || loading ? (
-                    <div className="text-center py-20">
-                        <div className="animate-spin w-8 h-8 border-2 border-stone-300 border-t-stone-900 rounded-full mx-auto"></div>
-                        <p className="text-stone-500 mt-4">Cargando favoritos...</p>
-                    </div>
-                ) : products.length === 0 ? (
+                {products.length === 0 ? (
                     <div className="text-center py-20">
                         <HeartIcon className="w-20 h-20 text-stone-300 mx-auto mb-4" />
                         <p className="text-stone-500 text-lg">No tienes favoritos aún</p>

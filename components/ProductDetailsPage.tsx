@@ -4,6 +4,7 @@ import { useProducts, Product } from '../backend/presentation/ProductContext';
 import { useFavorites } from '../backend/presentation/FavoritesContext';
 import { useAuth } from '../backend/presentation/AuthContext';
 import { toSlug } from './CategoryView';
+import { SkeletonHeader, SkeletonProductDetails } from './Skeletons';
 
 // ============================================================================
 // Icons
@@ -58,11 +59,21 @@ const StatusBadge: React.FC<{ status: Product['status'] }> = ({ status }) => {
 export const ProductDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { getProductById } = useProducts();
+    const { getProductById, loading: productsLoading } = useProducts();
     const { isFavorite, toggleFavorite } = useFavorites();
     const { isAuthenticated } = useAuth();
 
     const [showImageModal, setShowImageModal] = useState(false);
+
+    // ── Loading skeleton ──────────────────────────────────────────────────
+    if (productsLoading) {
+        return (
+            <div className="min-h-screen bg-stone-50">
+                <SkeletonHeader />
+                <SkeletonProductDetails />
+            </div>
+        );
+    }
 
     const product = id ? getProductById(id) : undefined;
 

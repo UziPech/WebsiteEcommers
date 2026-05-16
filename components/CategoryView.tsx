@@ -4,6 +4,7 @@ import { useProducts, Product } from '../backend/presentation/ProductContext';
 import { useFavorites } from '../backend/presentation/FavoritesContext';
 import { useAuth } from '../backend/presentation/AuthContext';
 import { useCategories } from '../backend/presentation/CategoryContext';
+import { SkeletonHeader, SkeletonHero, SkeletonGrid } from './Skeletons';
 
 // ============================================================================
 // Icons
@@ -178,7 +179,7 @@ interface CategoryViewProps {
 }
 
 export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, category }) => {
-    const { getProductsByCategory } = useProducts();
+    const { getProductsByCategory, loading: productsLoading } = useProducts();
     const { isFavorite, toggleFavorite } = useFavorites();
     const { isAuthenticated } = useAuth();
     
@@ -214,6 +215,19 @@ export const CategoryView: React.FC<CategoryViewProps> = ({ title, subtitle, cat
         }
         toggleFavorite(productId);
     };
+
+    // ── Loading skeleton ──────────────────────────────────────────────────
+    if (productsLoading) {
+        return (
+            <div className="min-h-screen bg-stone-50">
+                <SkeletonHeader />
+                <SkeletonHero />
+                <div className="max-w-7xl mx-auto px-6 pb-20">
+                    <SkeletonGrid count={8} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-stone-50">
